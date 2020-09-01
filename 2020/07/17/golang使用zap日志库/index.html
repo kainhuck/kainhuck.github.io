@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="1. 为什么使用zap因为它很快，而且我写不出比他更快的日志库😭 当然他还有其他优点，比如：它同时提供了结构化日志记录和printf风格的日志记录 2. 安装zap1go get -u go.uber.org&#x2F;zap  3. 配置zapzap提供两种日志记录器，如下表    名称 优点 缺点    Sugared Logger 支持结构化和printf风格的日志记录 较Logger慢   Log">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang使用zap日志库">
+<meta property="og:url" content="https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/index.html">
+<meta property="og:site_name" content="Kainhuck&#39;s blog">
+<meta property="og:description" content="1. 为什么使用zap因为它很快，而且我写不出比他更快的日志库😭 当然他还有其他优点，比如：它同时提供了结构化日志记录和printf风格的日志记录 2. 安装zap1go get -u go.uber.org&#x2F;zap  3. 配置zapzap提供两种日志记录器，如下表    名称 优点 缺点    Sugared Logger 支持结构化和printf风格的日志记录 较Logger慢   Log">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-17T13:57:35.000Z">
+<meta property="article:modified_time" content="2020-09-01T09:36:33.406Z">
+<meta property="article:author" content="KainHuck">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>golang使用zap日志库</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/07/18/golang%E5%AE%9E%E7%8E%B0%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&text=golang使用zap日志库"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&is_video=false&description=golang使用zap日志库"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=golang使用zap日志库&body=Check out this article: https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&name=golang使用zap日志库&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&t=golang使用zap日志库"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8zap"><span class="toc-number">1.</span> <span class="toc-text">1. 为什么使用zap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85zap"><span class="toc-number">2.</span> <span class="toc-text">2. 安装zap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%85%8D%E7%BD%AEzap"><span class="toc-number">3.</span> <span class="toc-text">3. 配置zap</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Logger"><span class="toc-number">3.1.</span> <span class="toc-text">Logger</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sugared-Logger"><span class="toc-number">3.2.</span> <span class="toc-text">Sugared Logger</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%AE%9A%E5%88%B6Logger"><span class="toc-number">4.</span> <span class="toc-text">4. 定制Logger</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#zap-Config"><span class="toc-number">4.1.</span> <span class="toc-text">zap.Config</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#zapcore-EncoderConfig"><span class="toc-number">4.2.</span> <span class="toc-text">zapcore.EncoderConfig</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%A0%B7%E4%BE%8B"><span class="toc-number">4.3.</span> <span class="toc-text">一个简单的样例</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        golang使用zap日志库
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kainhuck's blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-07-17T13:57:35.000Z" itemprop="datePublished">2020-07-17</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">编程语言</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/golang/" rel="tag">golang</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-为什么使用zap"><a href="#1-为什么使用zap" class="headerlink" title="1. 为什么使用zap"></a>1. 为什么使用zap</h2><p>因为它很快，而且我写不出比他更快的日志库😭</p>
+<p>当然他还有其他优点，比如：它同时提供了结构化日志记录和printf风格的日志记录</p>
+<h2 id="2-安装zap"><a href="#2-安装zap" class="headerlink" title="2. 安装zap"></a>2. 安装zap</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get -u go.uber.org/zap</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-配置zap"><a href="#3-配置zap" class="headerlink" title="3. 配置zap"></a>3. 配置zap</h2><p>zap提供两种日志记录器，如下表</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sugared Logger</td>
+<td>支持结构化和printf风格的日志记录</td>
+<td>较Logger慢</td>
+</tr>
+<tr>
+<td>Logger</td>
+<td>较Sugared Logger快</td>
+<td>只支持强类型的结构化日志记录</td>
+</tr>
+</tbody></table>
+<h3 id="Logger"><a href="#Logger" class="headerlink" title="Logger"></a>Logger</h3><ul>
+<li>创建Logger<ul>
+<li>zap.NewProduction()</li>
+<li>zap.NewDevelopment()</li>
+<li>zap.Example()</li>
+</ul>
+</li>
+<li>上述函数均可创建Logger只是输出信息不同</li>
+<li>默认情况下日志会打印到控制台</li>
+</ul>
+<p>举个例子</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;go.uber.org/zap&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> logger *zap.Logger</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ProductionLogger</span><span class="params">()</span></span>&#123;</span><br><span class="line">	logger,_ = zap.NewProduction()</span><br><span class="line">	logger.Info(<span class="string">&quot;log info&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DevelopmentLogger</span><span class="params">()</span></span>&#123;</span><br><span class="line">	logger,_ = zap.NewDevelopment()</span><br><span class="line">	logger.Info(<span class="string">&quot;log info&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ExampleLogger</span><span class="params">()</span></span>&#123;</span><br><span class="line">	logger = zap.NewExample()</span><br><span class="line">	logger.Info(<span class="string">&quot;log info&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ProductionLogger()</span><br><span class="line">	DevelopmentLogger()</span><br><span class="line">	ExampleLogger()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;level&quot;:&quot;info&quot;,&quot;ts&quot;:1594976812.8990078,&quot;caller&quot;:&quot;go_zap&#x2F;main.go:9&quot;,&quot;msg&quot;:&quot;log info&quot;&#125;</span><br><span class="line">2020-07-17T17:06:52.899+0800	INFO	go_zap&#x2F;main.go:14	log info</span><br><span class="line">&#123;&quot;level&quot;:&quot;info&quot;,&quot;msg&quot;:&quot;log info&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除DevelopmentLogger之外其余都是json格式输出</p>
+<h3 id="Sugared-Logger"><a href="#Sugared-Logger" class="headerlink" title="Sugared Logger"></a>Sugared Logger</h3><ul>
+<li>创建Sugared Logger<ul>
+<li>由Logger调用Sugar()方法获得</li>
+</ul>
+</li>
+<li>支持printf风格输出日志</li>
+</ul>
+<p>举个例子</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;go.uber.org/zap&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> sugarLogger *zap.SugaredLogger</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ProductionLogger</span><span class="params">()</span></span>&#123;</span><br><span class="line">	logger,_ := zap.NewProduction()</span><br><span class="line">	sugarLogger = logger.Sugar()</span><br><span class="line">	sugarLogger.Infof(<span class="string">&quot;sugar loger %s&quot;</span>, <span class="string">&quot;yes!&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DevelopmentLogger</span><span class="params">()</span></span>&#123;</span><br><span class="line">	logger,_ := zap.NewDevelopment()</span><br><span class="line">	sugarLogger = logger.Sugar()</span><br><span class="line">	sugarLogger.Infof(<span class="string">&quot;sugar loger %s&quot;</span>, <span class="string">&quot;yes!&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ExampleLogger</span><span class="params">()</span></span>&#123;</span><br><span class="line">	logger := zap.NewExample()</span><br><span class="line">	sugarLogger = logger.Sugar()</span><br><span class="line">	sugarLogger.Infof(<span class="string">&quot;sugar loger %s&quot;</span>, <span class="string">&quot;yes!&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ProductionLogger()</span><br><span class="line">	DevelopmentLogger()</span><br><span class="line">	ExampleLogger()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;level&quot;:&quot;info&quot;,&quot;ts&quot;:1594977351.4368348,&quot;caller&quot;:&quot;go_zap&#x2F;main.go:10&quot;,&quot;msg&quot;:&quot;sugar loger yes!&quot;&#125;</span><br><span class="line">2020-07-17T17:15:51.436+0800	INFO	go_zap&#x2F;main.go:16	sugar loger yes!</span><br><span class="line">&#123;&quot;level&quot;:&quot;info&quot;,&quot;msg&quot;:&quot;sugar loger yes!&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果和Logger类似，但是sugarLogger支持printf</p>
+<h2 id="4-定制Logger"><a href="#4-定制Logger" class="headerlink" title="4. 定制Logger"></a>4. 定制Logger</h2><p>上面所介绍到的三个创建Logger的方法包含了一些预置的配置，如果我们想要完全自定义，那我们就需要自己写好自己需要的配置。</p>
+<p>这些配置将被赋值给<code>zap.Config</code>结构体，然后这个结构体对象调用<code>Build</code>方法构造Logger，大概就像这样</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">config := zap.Config&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">log, err := config.Build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="zap-Config"><a href="#zap-Config" class="headerlink" title="zap.Config"></a>zap.Config</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Config <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// Level is the minimum enabled logging level. Note that this is a dynamic</span></span><br><span class="line">	<span class="comment">// level, so calling Config.Level.SetLevel will atomically change the log</span></span><br><span class="line">	<span class="comment">// level of all loggers descended from this config.</span></span><br><span class="line">	Level AtomicLevel <span class="string">`json:&quot;level&quot; yaml:&quot;level&quot;`</span></span><br><span class="line">	<span class="comment">// Development puts the logger in development mode, which changes the</span></span><br><span class="line">	<span class="comment">// behavior of DPanicLevel and takes stacktraces more liberally.</span></span><br><span class="line">	Development <span class="keyword">bool</span> <span class="string">`json:&quot;development&quot; yaml:&quot;development&quot;`</span></span><br><span class="line">	<span class="comment">// DisableCaller stops annotating logs with the calling function&#x27;s file</span></span><br><span class="line">	<span class="comment">// name and line number. By default, all logs are annotated.</span></span><br><span class="line">	DisableCaller <span class="keyword">bool</span> <span class="string">`json:&quot;disableCaller&quot; yaml:&quot;disableCaller&quot;`</span></span><br><span class="line">	<span class="comment">// DisableStacktrace completely disables automatic stacktrace capturing. By</span></span><br><span class="line">	<span class="comment">// default, stacktraces are captured for WarnLevel and above logs in</span></span><br><span class="line">	<span class="comment">// development and ErrorLevel and above in production.</span></span><br><span class="line">	DisableStacktrace <span class="keyword">bool</span> <span class="string">`json:&quot;disableStacktrace&quot; yaml:&quot;disableStacktrace&quot;`</span></span><br><span class="line">	<span class="comment">// Sampling sets a sampling policy. A nil SamplingConfig disables sampling.</span></span><br><span class="line">	Sampling *SamplingConfig <span class="string">`json:&quot;sampling&quot; yaml:&quot;sampling&quot;`</span></span><br><span class="line">	<span class="comment">// Encoding sets the logger&#x27;s encoding. Valid values are &quot;json&quot; and</span></span><br><span class="line">	<span class="comment">// &quot;console&quot;, as well as any third-party encodings registered via</span></span><br><span class="line">	<span class="comment">// RegisterEncoder.</span></span><br><span class="line">	Encoding <span class="keyword">string</span> <span class="string">`json:&quot;encoding&quot; yaml:&quot;encoding&quot;`</span></span><br><span class="line">	<span class="comment">// EncoderConfig sets options for the chosen encoder. See</span></span><br><span class="line">	<span class="comment">// zapcore.EncoderConfig for details.</span></span><br><span class="line">	EncoderConfig zapcore.EncoderConfig <span class="string">`json:&quot;encoderConfig&quot; yaml:&quot;encoderConfig&quot;`</span></span><br><span class="line">	<span class="comment">// OutputPaths is a list of URLs or file paths to write logging output to.</span></span><br><span class="line">	<span class="comment">// See Open for details.</span></span><br><span class="line">	OutputPaths []<span class="keyword">string</span> <span class="string">`json:&quot;outputPaths&quot; yaml:&quot;outputPaths&quot;`</span></span><br><span class="line">	<span class="comment">// ErrorOutputPaths is a list of URLs to write internal logger errors to.</span></span><br><span class="line">	<span class="comment">// The default is standard error.</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">// Note that this setting only affects internal errors; for sample code that</span></span><br><span class="line">	<span class="comment">// sends error-level logs to a different location from info- and debug-level</span></span><br><span class="line">	<span class="comment">// logs, see the package-level AdvancedConfiguration example.</span></span><br><span class="line">	ErrorOutputPaths []<span class="keyword">string</span> <span class="string">`json:&quot;errorOutputPaths&quot; yaml:&quot;errorOutputPaths&quot;`</span></span><br><span class="line">	<span class="comment">// InitialFields is a collection of fields to add to the root logger.</span></span><br><span class="line">	InitialFields <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125; <span class="string">`json:&quot;initialFields&quot; yaml:&quot;initialFields&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们需要特别注意的是<code>EncoderConfig</code>这个字段，它定义了我们输出的格式，根据他的提示我们来看看<code>zapcore.EncoderConfig</code>结构体</p>
+<h3 id="zapcore-EncoderConfig"><a href="#zapcore-EncoderConfig" class="headerlink" title="zapcore.EncoderConfig"></a>zapcore.EncoderConfig</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// An EncoderConfig allows users to configure the concrete encoders supplied by</span></span><br><span class="line"><span class="comment">// zapcore.</span></span><br><span class="line"><span class="keyword">type</span> EncoderConfig <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// Set the keys used for each log entry. If any key is empty, that portion</span></span><br><span class="line">	<span class="comment">// of the entry is omitted.</span></span><br><span class="line">	MessageKey    <span class="keyword">string</span> <span class="string">`json:&quot;messageKey&quot; yaml:&quot;messageKey&quot;`</span></span><br><span class="line">	LevelKey      <span class="keyword">string</span> <span class="string">`json:&quot;levelKey&quot; yaml:&quot;levelKey&quot;`</span></span><br><span class="line">	TimeKey       <span class="keyword">string</span> <span class="string">`json:&quot;timeKey&quot; yaml:&quot;timeKey&quot;`</span></span><br><span class="line">	NameKey       <span class="keyword">string</span> <span class="string">`json:&quot;nameKey&quot; yaml:&quot;nameKey&quot;`</span></span><br><span class="line">	CallerKey     <span class="keyword">string</span> <span class="string">`json:&quot;callerKey&quot; yaml:&quot;callerKey&quot;`</span></span><br><span class="line">	StacktraceKey <span class="keyword">string</span> <span class="string">`json:&quot;stacktraceKey&quot; yaml:&quot;stacktraceKey&quot;`</span></span><br><span class="line">	LineEnding    <span class="keyword">string</span> <span class="string">`json:&quot;lineEnding&quot; yaml:&quot;lineEnding&quot;`</span></span><br><span class="line">	<span class="comment">// Configure the primitive representations of common complex types. For</span></span><br><span class="line">	<span class="comment">// example, some users may want all time.Times serialized as floating-point</span></span><br><span class="line">	<span class="comment">// seconds since epoch, while others may prefer ISO8601 strings.</span></span><br><span class="line">	EncodeLevel    LevelEncoder    <span class="string">`json:&quot;levelEncoder&quot; yaml:&quot;levelEncoder&quot;`</span></span><br><span class="line">	EncodeTime     TimeEncoder     <span class="string">`json:&quot;timeEncoder&quot; yaml:&quot;timeEncoder&quot;`</span></span><br><span class="line">	EncodeDuration DurationEncoder <span class="string">`json:&quot;durationEncoder&quot; yaml:&quot;durationEncoder&quot;`</span></span><br><span class="line">	EncodeCaller   CallerEncoder   <span class="string">`json:&quot;callerEncoder&quot; yaml:&quot;callerEncoder&quot;`</span></span><br><span class="line">	<span class="comment">// Unlike the other primitive type encoders, EncodeName is optional. The</span></span><br><span class="line">	<span class="comment">// zero value falls back to FullNameEncoder.</span></span><br><span class="line">	EncodeName NameEncoder <span class="string">`json:&quot;nameEncoder&quot; yaml:&quot;nameEncoder&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这些字段都不难理解，让我们来写一个例子吧</p>
+<h3 id="一个简单的样例"><a href="#一个简单的样例" class="headerlink" title="一个简单的样例"></a>一个简单的样例</h3><p>一般情况下我们都是用SugaredLogger因为它的速度足够快，而其功能更加强大，如果呢不知道该怎么选择不如就把两个都选上吧，就像这样</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;go.uber.org/zap&quot;</span></span><br><span class="line">	<span class="string">&quot;go.uber.org/zap/zapcore&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> Logger *zap.Logger</span><br><span class="line"><span class="keyword">var</span> SugarLogger *zap.SugaredLogger</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Init</span><span class="params">()</span> <span class="title">error</span></span>&#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line">	<span class="comment">// 构造EncoderConfig</span></span><br><span class="line">	encoderConfig := zapcore.EncoderConfig&#123;</span><br><span class="line">		TimeKey: <span class="string">&quot;timestamp&quot;</span>,</span><br><span class="line">		LevelKey: <span class="string">&quot;severity&quot;</span>,</span><br><span class="line">		NameKey: <span class="string">&quot;logger&quot;</span>,</span><br><span class="line">		CallerKey: <span class="string">&quot;caller&quot;</span>,</span><br><span class="line">		MessageKey: <span class="string">&quot;message&quot;</span>,</span><br><span class="line">		StacktraceKey: <span class="string">&quot;stacktrace&quot;</span>,</span><br><span class="line">		LineEnding: <span class="string">&quot;\n&quot;</span>,</span><br><span class="line">		EncodeLevel: zapcore.LowercaseLevelEncoder,</span><br><span class="line">		EncodeTime: zapcore.ISO8601TimeEncoder,</span><br><span class="line">		EncodeDuration: zapcore.SecondsDurationEncoder,</span><br><span class="line">		EncodeCaller:   zapcore.FullCallerEncoder,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 构造 Config</span></span><br><span class="line">	config := zap.Config&#123;</span><br><span class="line">		Level: zap.NewAtomicLevelAt(zapcore.DebugLevel),</span><br><span class="line">		Development: <span class="literal">true</span>,</span><br><span class="line">		Encoding: <span class="string">&quot;json&quot;</span>,</span><br><span class="line">		EncoderConfig: encoderConfig,</span><br><span class="line">		InitialFields: <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;<span class="string">&quot;MyName&quot;</span>: <span class="string">&quot;kainhuck&quot;</span>&#125;,</span><br><span class="line">		OutputPaths: []<span class="keyword">string</span>&#123;<span class="string">&quot;stdout&quot;</span>&#125;,</span><br><span class="line">		ErrorOutputPaths: []<span class="keyword">string</span>&#123;<span class="string">&quot;stdout&quot;</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 可以构造Logger了</span></span><br><span class="line">	Logger, err = config.Build()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 然后是SugarLogger</span></span><br><span class="line">	SugarLogger = Logger.Sugar()</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	err := Init()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	SugarLogger.Debugf(<span class="string">&quot;ohhhhhhh err:%s&quot;</span>, <span class="string">&quot;horika&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;severity&quot;</span>:<span class="string">&quot;debug&quot;</span>,<span class="attr">&quot;timestamp&quot;</span>:<span class="string">&quot;2020-07-17T17:58:56.626+0800&quot;</span>,<span class="attr">&quot;caller&quot;</span>:<span class="string">&quot;D:/Coding/go_module/go_zap/main.go:56&quot;</span>,<span class="attr">&quot;message&quot;</span>:<span class="string">&quot;ohhhhhhh err:horika&quot;</span>,<span class="attr">&quot;MyName&quot;</span>:<span class="string">&quot;kainhuck&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8zap"><span class="toc-number">1.</span> <span class="toc-text">1. 为什么使用zap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85zap"><span class="toc-number">2.</span> <span class="toc-text">2. 安装zap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%85%8D%E7%BD%AEzap"><span class="toc-number">3.</span> <span class="toc-text">3. 配置zap</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Logger"><span class="toc-number">3.1.</span> <span class="toc-text">Logger</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sugared-Logger"><span class="toc-number">3.2.</span> <span class="toc-text">Sugared Logger</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%AE%9A%E5%88%B6Logger"><span class="toc-number">4.</span> <span class="toc-text">4. 定制Logger</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#zap-Config"><span class="toc-number">4.1.</span> <span class="toc-text">zap.Config</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#zapcore-EncoderConfig"><span class="toc-number">4.2.</span> <span class="toc-text">zapcore.EncoderConfig</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%A0%B7%E4%BE%8B"><span class="toc-number">4.3.</span> <span class="toc-text">一个简单的样例</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&text=golang使用zap日志库"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&is_video=false&description=golang使用zap日志库"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=golang使用zap日志库&body=Check out this article: https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&title=golang使用zap日志库"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&name=golang使用zap日志库&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/07/17/golang%E4%BD%BF%E7%94%A8zap%E6%97%A5%E5%BF%97%E5%BA%93/&t=golang使用zap日志库"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    KainHuck
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
