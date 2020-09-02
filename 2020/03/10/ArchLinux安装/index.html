@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="1. 联网1wifi-menu  检查是否联通 1ping www.baidu.com  2. 更新系统时钟1timedatectl set-ntp true  3. 磁盘分区用下面命令检查你要安装的磁盘 1fdisk -l  这里假设安装到&#x2F;dev&#x2F;sda，然后用下面命令对磁盘分区 fdisk用法  g 建立gpt分区表 n 新建分区 w 写入磁盘 p 打印信息 d 删除分区 t 指定类型 q">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ArchLinux安装(BIOS)">
+<meta property="og:url" content="https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/index.html">
+<meta property="og:site_name" content="Kainhuck&#39;s blog">
+<meta property="og:description" content="1. 联网1wifi-menu  检查是否联通 1ping www.baidu.com  2. 更新系统时钟1timedatectl set-ntp true  3. 磁盘分区用下面命令检查你要安装的磁盘 1fdisk -l  这里假设安装到&#x2F;dev&#x2F;sda，然后用下面命令对磁盘分区 fdisk用法  g 建立gpt分区表 n 新建分区 w 写入磁盘 p 打印信息 d 删除分区 t 指定类型 q">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-10T10:30:06.000Z">
+<meta property="article:modified_time" content="2020-09-02T08:29:48.416Z">
+<meta property="article:author" content="KainHuck">
+<meta property="article:tag" content="Arch">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>ArchLinux安装(BIOS)</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/03/12/Python%E4%BB%8E%E5%9B%BE%E7%89%87%E4%B8%AD%E6%8F%90%E5%8F%96%E6%96%87%E5%AD%97/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2020/03/05/Python-request%E4%BD%BF%E7%94%A8socks5%E4%BB%A3%E7%90%86/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&text=ArchLinux安装(BIOS)"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&is_video=false&description=ArchLinux安装(BIOS)"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=ArchLinux安装(BIOS)&body=Check out this article: https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&name=ArchLinux安装(BIOS)&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&t=ArchLinux安装(BIOS)"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%81%94%E7%BD%91"><span class="toc-number">1.</span> <span class="toc-text">1. 联网</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9B%B4%E6%96%B0%E7%B3%BB%E7%BB%9F%E6%97%B6%E9%92%9F"><span class="toc-number">2.</span> <span class="toc-text">2. 更新系统时钟</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA"><span class="toc-number">3.</span> <span class="toc-text">3. 磁盘分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%88%86%E5%8C%BA"><span class="toc-number">4.</span> <span class="toc-text">4. 格式化分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%8C%82%E8%BD%BD%E5%88%86%E5%8C%BA"><span class="toc-number">5.</span> <span class="toc-text">5. 挂载分区</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%85%88%E5%B0%86%E6%A0%B9%E5%88%86%E5%8C%BA%E6%8C%82%E8%BD%BD%E5%88%B0-mnt%E7%9B%AE%E5%BD%95"><span class="toc-number">5.1.</span> <span class="toc-text">1. 先将根分区挂载到&#x2F;mnt目录</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%86%8D%E5%9C%A8-mnt%E7%9B%AE%E5%BD%95%E4%B8%8B%E6%96%B0%E5%BB%BAboot%E7%9B%AE%E5%BD%95"><span class="toc-number">5.1.1.</span> <span class="toc-text">2. 再在&#x2F;mnt目录下新建boot目录</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%9C%80%E5%90%8E%E5%B0%86boot%E5%88%86%E5%8C%BA%E6%8C%82%E8%BD%BD%E5%9C%A8%E5%88%9A%E5%88%9A%E5%88%9B%E5%BB%BA%E7%9A%84-mnt-boot%E7%9B%AE%E5%BD%95"><span class="toc-number">5.2.</span> <span class="toc-text">3. 最后将boot分区挂载在刚刚创建的&#x2F;mnt&#x2F;boot目录</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85%E7%B3%BB%E7%BB%9F"><span class="toc-number">6.</span> <span class="toc-text">6. 开始安装系统</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%85%88%E9%85%8D%E7%BD%AE%E8%BD%AF%E4%BB%B6%E6%BA%90%EF%BC%88%E6%8E%A8%E8%8D%90%E9%80%89%E6%8B%A9%E6%B8%85%E5%8D%8E%E6%BA%90%EF%BC%89"><span class="toc-number">6.1.</span> <span class="toc-text">1. 先配置软件源（推荐选择清华源）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%88%B7%E6%96%B0%E4%B8%80%E4%B8%8B"><span class="toc-number">6.2.</span> <span class="toc-text">2. 刷新一下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%84%B6%E5%90%8E%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85%E7%B3%BB%E7%BB%9F%E5%88%B0-dev-sda1%E4%B9%9F%E5%B0%B1%E6%98%AF%E6%8C%82%E8%BD%BD%E7%82%B9-mnt"><span class="toc-number">6.3.</span> <span class="toc-text">3. 然后开始安装系统到&#x2F;dev&#x2F;sda1也就是挂载点&#x2F;mnt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%AE%89%E8%A3%85%E5%AE%8C%E6%88%90%E4%B9%8B%E5%90%8E%E9%9C%80%E7%94%9F%E6%88%90fstab%E6%96%87%E4%BB%B6"><span class="toc-number">6.4.</span> <span class="toc-text">4. 安装完成之后需生成fstab文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E5%88%87%E6%8D%A2%E7%8E%AF%E5%A2%83"><span class="toc-number">7.</span> <span class="toc-text">7. 切换环境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%87%E6%8D%A2%E5%88%B0%E5%88%9A%E5%88%9A%E5%AE%89%E8%A3%85%E5%A5%BD%E7%9A%84%E7%B3%BB%E7%BB%9F"><span class="toc-number">7.1.</span> <span class="toc-text">1. 切换到刚刚安装好的系统</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%85%8D%E7%BD%AE%E6%97%B6%E5%8C%BA"><span class="toc-number">7.2.</span> <span class="toc-text">2. 配置时区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%AE%BE%E7%BD%AE%E7%A1%AC%E4%BB%B6%E6%97%B6%E9%97%B4"><span class="toc-number">7.3.</span> <span class="toc-text">3. 设置硬件时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%AE%89%E8%A3%85vim-%E6%88%91%E4%B9%A0%E6%83%AF%E4%BA%86%E4%BD%BF%E7%94%A8vim%E7%BC%96%E8%BE%91"><span class="toc-number">7.4.</span> <span class="toc-text">4. 安装vim(我习惯了使用vim编辑)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E8%AE%BE%E7%BD%AE%E8%AF%AD%E8%A8%80"><span class="toc-number">7.5.</span> <span class="toc-text">5. 设置语言</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%B0%86-etc-locale-gen%E4%B8%ADen-US-UTF-8%E5%92%8Czh-CN-UTF-8%E7%9A%84%E6%B3%A8%E9%87%8A%E5%8E%BB%E6%8E%89"><span class="toc-number">7.5.1.</span> <span class="toc-text">1. 将&#x2F;etc&#x2F;locale.gen中en_US.UTF-8和zh_CN.UTF-8的注释去掉</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E7%84%B6%E5%90%8E%E7%94%9F%E6%88%90%E4%B8%80%E4%B8%8B"><span class="toc-number">7.5.2.</span> <span class="toc-text">2. 然后生成一下</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%85%8D%E7%BD%AE-etc-locale-conf%E6%96%87%E4%BB%B6"><span class="toc-number">7.5.3.</span> <span class="toc-text">3. 配置 &#x2F;etc&#x2F;locale.conf文件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E8%AE%BE%E7%BD%AEroot%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81"><span class="toc-number">7.6.</span> <span class="toc-text">6. 设置root用户密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%AE%89%E8%A3%85%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3%E7%9A%84%E5%8C%85"><span class="toc-number">7.7.</span> <span class="toc-text">7. 安装网络相关的包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E6%8C%89%E8%A3%85cpu%E7%BC%96%E7%A0%81"><span class="toc-number">7.8.</span> <span class="toc-text">8. 按装cpu编码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E5%AE%89%E8%A3%85%E5%BC%95%E5%AF%BC"><span class="toc-number">7.9.</span> <span class="toc-text">9. 安装引导</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-%E7%BB%99%E4%BD%A0%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%8F%96%E4%B8%AA%E5%90%8D%E5%AD%97"><span class="toc-number">7.10.</span> <span class="toc-text">10. 给你的系统取个名字</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E5%BC%80%E5%A7%8B%E6%8C%89%E8%A3%85kde-plasma"><span class="toc-number">8.</span> <span class="toc-text">8. 开始按装kde-plasma</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%89%E8%A3%85Xorg"><span class="toc-number">8.1.</span> <span class="toc-text">1. 安装Xorg</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85%E8%A7%A6%E6%91%B8%E6%9D%BF%E9%A9%B1%E5%8A%A8"><span class="toc-number">8.2.</span> <span class="toc-text">2. 安装触摸板驱动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AE%89%E8%A3%85%E5%AD%97%E4%BD%93"><span class="toc-number">8.3.</span> <span class="toc-text">3. 安装字体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="toc-number">8.4.</span> <span class="toc-text">4. 创建用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85%E6%A1%8C%E9%9D%A2"><span class="toc-number">8.5.</span> <span class="toc-text">5. 开始安装桌面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%89%E8%A3%85%E6%A1%8C%E9%9D%A2%E5%8F%8A%E5%9F%BA%E6%9C%AC%E5%BA%94%E7%94%A8"><span class="toc-number">8.6.</span> <span class="toc-text">1. 安装桌面及基本应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%BF%80%E6%B4%BB%E7%99%BB%E5%BD%95%E7%AA%97%E5%8F%A3sddm"><span class="toc-number">8.7.</span> <span class="toc-text">2. 激活登录窗口sddm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AE%89%E8%A3%85%E5%A3%B0%E9%9F%B3"><span class="toc-number">8.8.</span> <span class="toc-text">3. 安装声音</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B6%E4%BB%96"><span class="toc-number">8.9.</span> <span class="toc-text">4. 其他</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E9%80%80%E5%87%BA%E5%BD%93%E5%89%8D%E7%8E%AF%E5%A2%83"><span class="toc-number">9.</span> <span class="toc-text">9. 退出当前环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E5%8D%B8%E8%BD%BD%E5%88%86%E5%8C%BA"><span class="toc-number">10.</span> <span class="toc-text">10. 卸载分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-%E9%87%8D%E5%90%AF"><span class="toc-number">11.</span> <span class="toc-text">11. 重启</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        ArchLinux安装(BIOS)
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kainhuck's blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-03-10T10:30:06.000Z" itemprop="datePublished">2020-03-10</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/Linux/">Linux</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Arch/" rel="tag">Arch</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-联网"><a href="#1-联网" class="headerlink" title="1. 联网"></a>1. 联网</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wifi-menu</span><br></pre></td></tr></table></figure>
+
+<p><em>检查是否联通</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping www.baidu.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-更新系统时钟"><a href="#2-更新系统时钟" class="headerlink" title="2. 更新系统时钟"></a>2. 更新系统时钟</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timedatectl set-ntp true</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-磁盘分区"><a href="#3-磁盘分区" class="headerlink" title="3. 磁盘分区"></a>3. 磁盘分区</h2><p>用下面命令检查你要安装的磁盘</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdisk -l</span><br></pre></td></tr></table></figure>
+
+<p>这里假设安装到<code>/dev/sda</code>，然后用下面命令对磁盘分区</p>
+<p>fdisk用法</p>
+<ul>
+<li>g 建立gpt分区表</li>
+<li>n 新建分区</li>
+<li>w 写入磁盘</li>
+<li>p 打印信息</li>
+<li>d 删除分区</li>
+<li>t 指定类型</li>
+<li>q 不保存退出</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdisk &#x2F;dev&#x2F;sda</span><br></pre></td></tr></table></figure>
+
+<p>这里我给出我的方案：</p>
+<table>
+<thead>
+<tr>
+<th>类形</th>
+<th>磁盘大小</th>
+<th>磁盘序号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>boot分区</td>
+<td>500m</td>
+<td>/dev/sda1</td>
+</tr>
+<tr>
+<td>swap分区</td>
+<td>6G</td>
+<td>/dev/sda2</td>
+</tr>
+<tr>
+<td>根分区</td>
+<td>其余</td>
+<td>/dev/sda3</td>
+</tr>
+</tbody></table>
+<p>home目录我是在系统安装好后进行的，你们也可以在这一步进行</p>
+<h2 id="4-格式化分区"><a href="#4-格式化分区" class="headerlink" title="4. 格式化分区"></a>4. 格式化分区</h2><p>将boot分区格式化为 <code>ext2</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkfs.ext2 &#x2F;dev&#x2F;sda1</span><br></pre></td></tr></table></figure>
+
+<p>将swap分区格式化为<code>swap</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkswap &#x2F;dev&#x2F;sda2</span><br></pre></td></tr></table></figure>
+
+<p>打开swap分区</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swapon &#x2F;dev&#x2F;sda2</span><br></pre></td></tr></table></figure>
+
+<p>将根目录/home目录格式化为<code>ext4</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkfs.ext4 &#x2F;dev&#x2F;sda3</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-挂载分区"><a href="#5-挂载分区" class="headerlink" title="5. 挂载分区"></a>5. 挂载分区</h2><h3 id="1-先将根分区挂载到-mnt目录"><a href="#1-先将根分区挂载到-mnt目录" class="headerlink" title="1. 先将根分区挂载到/mnt目录"></a>1. 先将根分区挂载到<code>/mnt</code>目录</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount &#x2F;dev&#x2F;sda3 &#x2F;mnt</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-再在-mnt目录下新建boot目录"><a href="#2-再在-mnt目录下新建boot目录" class="headerlink" title="2. 再在/mnt目录下新建boot目录"></a>2. 再在<code>/mnt</code>目录下新建<code>boot</code>目录</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir &#x2F;mnt&#x2F;boot</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-最后将boot分区挂载在刚刚创建的-mnt-boot目录"><a href="#3-最后将boot分区挂载在刚刚创建的-mnt-boot目录" class="headerlink" title="3. 最后将boot分区挂载在刚刚创建的/mnt/boot目录"></a>3. 最后将boot分区挂载在刚刚创建的<code>/mnt/boot</code>目录</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount &#x2F;dev&#x2F;sda1 &#x2F;mnt&#x2F;boot</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-开始安装系统"><a href="#6-开始安装系统" class="headerlink" title="6. 开始安装系统"></a>6. 开始安装系统</h2><h3 id="1-先配置软件源（推荐选择清华源）"><a href="#1-先配置软件源（推荐选择清华源）" class="headerlink" title="1. 先配置软件源（推荐选择清华源）"></a>1. 先配置软件源（推荐选择清华源）</h3><p>搜索<code>tuna</code>将其粘贴到文件第一行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;pacman.d&#x2F;mirrorlist</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-刷新一下"><a href="#2-刷新一下" class="headerlink" title="2. 刷新一下"></a>2. 刷新一下</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -Syy</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-然后开始安装系统到-dev-sda1也就是挂载点-mnt"><a href="#3-然后开始安装系统到-dev-sda1也就是挂载点-mnt" class="headerlink" title="3. 然后开始安装系统到/dev/sda1也就是挂载点/mnt"></a>3. 然后开始安装系统到<code>/dev/sda1</code>也就是挂载点<code>/mnt</code></h3><p>其中必须安装的有<code>base</code> <code>linux</code> <code>linux-firmware</code>，推介也把<code>base-devel</code>安装上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacstrap &#x2F;mnt base linux linux-firmware base-devel</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-安装完成之后需生成fstab文件"><a href="#4-安装完成之后需生成fstab文件" class="headerlink" title="4. 安装完成之后需生成fstab文件"></a>4. 安装完成之后需生成<code>fstab</code>文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">genfstab -U &#x2F;mnt &gt;&gt; &#x2F;mnt&#x2F;etc&#x2F;fstab</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-切换环境"><a href="#7-切换环境" class="headerlink" title="7. 切换环境"></a>7. 切换环境</h2><h3 id="1-切换到刚刚安装好的系统"><a href="#1-切换到刚刚安装好的系统" class="headerlink" title="1. 切换到刚刚安装好的系统"></a>1. 切换到刚刚安装好的系统</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arch-chroot &#x2F;mnt</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-配置时区"><a href="#2-配置时区" class="headerlink" title="2. 配置时区"></a>2. 配置时区</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -sf &#x2F;usr&#x2F;share&#x2F;zoneinfo&#x2F;Asia&#x2F;Shanghai &#x2F;etc&#x2F;localtime</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-设置硬件时间"><a href="#3-设置硬件时间" class="headerlink" title="3. 设置硬件时间"></a>3. 设置硬件时间</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hwclock --systohc</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-安装vim-我习惯了使用vim编辑"><a href="#4-安装vim-我习惯了使用vim编辑" class="headerlink" title="4. 安装vim(我习惯了使用vim编辑)"></a>4. 安装vim(我习惯了使用vim编辑)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S vim</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-设置语言"><a href="#5-设置语言" class="headerlink" title="5. 设置语言"></a>5. 设置语言</h3><h4 id="1-将-etc-locale-gen中en-US-UTF-8和zh-CN-UTF-8的注释去掉"><a href="#1-将-etc-locale-gen中en-US-UTF-8和zh-CN-UTF-8的注释去掉" class="headerlink" title="1. 将/etc/locale.gen中en_US.UTF-8和zh_CN.UTF-8的注释去掉"></a>1. 将/etc/locale.gen中<code>en_US.UTF-8</code>和<code>zh_CN.UTF-8</code>的注释去掉</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;locale.gen</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-然后生成一下"><a href="#2-然后生成一下" class="headerlink" title="2. 然后生成一下"></a>2. 然后生成一下</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">locale-gen</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-配置-etc-locale-conf文件"><a href="#3-配置-etc-locale-conf文件" class="headerlink" title="3. 配置 /etc/locale.conf文件"></a>3. 配置 /etc/locale.conf文件</h4><p>在 <code>/etc/locale.conf</code>文件中写入<code>LANG=en_US.UTF-8</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo LANG&#x3D;en_US.UTF-8 &gt;&gt; &#x2F;etc&#x2F;locale.conf</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-设置root用户密码"><a href="#6-设置root用户密码" class="headerlink" title="6. 设置root用户密码"></a>6. 设置root用户密码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-安装网络相关的包"><a href="#7-安装网络相关的包" class="headerlink" title="7. 安装网络相关的包"></a>7. 安装网络相关的包</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S iw wpa_supplicant dialog net-tools networkmanager dhcpcd</span><br></pre></td></tr></table></figure>
+
+<p>设置网络工具开机自启</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable NetworkManager</span><br><span class="line">systemctl enable dhcpcd</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-按装cpu编码"><a href="#8-按装cpu编码" class="headerlink" title="8. 按装cpu编码"></a>8. 按装cpu编码</h3><p>如果是<code>intel</code>cpu</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S intel-ucode</span><br></pre></td></tr></table></figure>
+
+<p>如果是<code>amd</code>cpu</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S amd-ucode</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-安装引导"><a href="#9-安装引导" class="headerlink" title="9. 安装引导"></a>9. 安装引导</h3><p>注意第二条命令是你安装系统的盘符，如果你安装在<code>/dev/sdb</code>就填<code>/dev/sdb</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pacman -S grub</span><br><span class="line">grub-install &#x2F;dev&#x2F;sda</span><br><span class="line">grub-mkconfig -o &#x2F;boot&#x2F;grub&#x2F;grub.cfg</span><br></pre></td></tr></table></figure>
+
+<h3 id="10-给你的系统取个名字"><a href="#10-给你的系统取个名字" class="headerlink" title="10. 给你的系统取个名字"></a>10. 给你的系统取个名字</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo yourname &gt; &#x2F;etc&#x2F;hostname </span><br></pre></td></tr></table></figure>
+
+<p><strong><em>到此系统就安装好了，先别急着退出，接下来开始安装桌面</em></strong></p>
+<h2 id="8-开始按装kde-plasma"><a href="#8-开始按装kde-plasma" class="headerlink" title="8. 开始按装kde-plasma"></a>8. 开始按装kde-plasma</h2><h3 id="1-安装Xorg"><a href="#1-安装Xorg" class="headerlink" title="1. 安装Xorg"></a>1. 安装Xorg</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S xorg</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-安装触摸板驱动"><a href="#2-安装触摸板驱动" class="headerlink" title="2. 安装触摸板驱动"></a>2. 安装触摸板驱动</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S xf86-input-synaptics</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-安装字体"><a href="#3-安装字体" class="headerlink" title="3. 安装字体"></a>3. 安装字体</h3><p>超级喜欢<code>dejavu</code>字体</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S ttf-dejavu wqy-microhei</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-创建用户"><a href="#4-创建用户" class="headerlink" title="4. 创建用户"></a>4. 创建用户</h3><p>将新建用户移入<code>wheel</code>组并指定shell为<code>bash</code>(以后可修改)</p>
+<p>kain 为我设置的用户，你们可以取别的名字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -m -G wheel -s &#x2F;bin&#x2F;bash kain</span><br></pre></td></tr></table></figure>
+
+<p>为新用户设置密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd kain</span><br></pre></td></tr></table></figure>
+
+<p>为新用户添加管理员权限（可以使用sudo命令）</p>
+<p>将文件<code>/etc/sudoers</code>中的<code>wheel ALL=(ALL) ALL</code>那一行前面的注释去掉</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sudoers</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-开始安装桌面"><a href="#5-开始安装桌面" class="headerlink" title="5. 开始安装桌面"></a>5. 开始安装桌面</h3><h3 id="1-安装桌面及基本应用"><a href="#1-安装桌面及基本应用" class="headerlink" title="1. 安装桌面及基本应用"></a>1. 安装桌面及基本应用</h3><p>其中<code>plasma</code>是必须的<code>kde-applications</code>是一些常用软件包括终端和文件管理器等，还有许多小游戏（为了方便推荐安装上）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S plasma kde-applications</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-激活登录窗口sddm"><a href="#2-激活登录窗口sddm" class="headerlink" title="2. 激活登录窗口sddm"></a>2. 激活登录窗口<code>sddm</code></h3><p>sddm已经被包含进<code>plasma</code>中，无需另外安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable sddm</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-安装声音"><a href="#3-安装声音" class="headerlink" title="3. 安装声音"></a>3. 安装声音</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S alsa-utils pulseaudio pulseaudio-alsa</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-其他"><a href="#4-其他" class="headerlink" title="4. 其他"></a>4. 其他</h3><p>解决kde中部分应用无法使用全局菜单栏的问题，需安装下面的库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S libdbusmenu-glib</span><br></pre></td></tr></table></figure>
+
+
+
+<p>到这里arch已经完全安装结束了</p>
+<h2 id="9-退出当前环境"><a href="#9-退出当前环境" class="headerlink" title="9. 退出当前环境"></a>9. 退出当前环境</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exit</span><br></pre></td></tr></table></figure>
+
+<h2 id="10-卸载分区"><a href="#10-卸载分区" class="headerlink" title="10. 卸载分区"></a>10. 卸载分区</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount -R &#x2F;mnt</span><br></pre></td></tr></table></figure>
+
+<h2 id="11-重启"><a href="#11-重启" class="headerlink" title="11. 重启"></a>11. 重启</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reboot</span><br></pre></td></tr></table></figure>
+
+<p>拔掉u盘</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%81%94%E7%BD%91"><span class="toc-number">1.</span> <span class="toc-text">1. 联网</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%9B%B4%E6%96%B0%E7%B3%BB%E7%BB%9F%E6%97%B6%E9%92%9F"><span class="toc-number">2.</span> <span class="toc-text">2. 更新系统时钟</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA"><span class="toc-number">3.</span> <span class="toc-text">3. 磁盘分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%88%86%E5%8C%BA"><span class="toc-number">4.</span> <span class="toc-text">4. 格式化分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%8C%82%E8%BD%BD%E5%88%86%E5%8C%BA"><span class="toc-number">5.</span> <span class="toc-text">5. 挂载分区</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%85%88%E5%B0%86%E6%A0%B9%E5%88%86%E5%8C%BA%E6%8C%82%E8%BD%BD%E5%88%B0-mnt%E7%9B%AE%E5%BD%95"><span class="toc-number">5.1.</span> <span class="toc-text">1. 先将根分区挂载到&#x2F;mnt目录</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%86%8D%E5%9C%A8-mnt%E7%9B%AE%E5%BD%95%E4%B8%8B%E6%96%B0%E5%BB%BAboot%E7%9B%AE%E5%BD%95"><span class="toc-number">5.1.1.</span> <span class="toc-text">2. 再在&#x2F;mnt目录下新建boot目录</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%9C%80%E5%90%8E%E5%B0%86boot%E5%88%86%E5%8C%BA%E6%8C%82%E8%BD%BD%E5%9C%A8%E5%88%9A%E5%88%9A%E5%88%9B%E5%BB%BA%E7%9A%84-mnt-boot%E7%9B%AE%E5%BD%95"><span class="toc-number">5.2.</span> <span class="toc-text">3. 最后将boot分区挂载在刚刚创建的&#x2F;mnt&#x2F;boot目录</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85%E7%B3%BB%E7%BB%9F"><span class="toc-number">6.</span> <span class="toc-text">6. 开始安装系统</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%85%88%E9%85%8D%E7%BD%AE%E8%BD%AF%E4%BB%B6%E6%BA%90%EF%BC%88%E6%8E%A8%E8%8D%90%E9%80%89%E6%8B%A9%E6%B8%85%E5%8D%8E%E6%BA%90%EF%BC%89"><span class="toc-number">6.1.</span> <span class="toc-text">1. 先配置软件源（推荐选择清华源）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%88%B7%E6%96%B0%E4%B8%80%E4%B8%8B"><span class="toc-number">6.2.</span> <span class="toc-text">2. 刷新一下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%84%B6%E5%90%8E%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85%E7%B3%BB%E7%BB%9F%E5%88%B0-dev-sda1%E4%B9%9F%E5%B0%B1%E6%98%AF%E6%8C%82%E8%BD%BD%E7%82%B9-mnt"><span class="toc-number">6.3.</span> <span class="toc-text">3. 然后开始安装系统到&#x2F;dev&#x2F;sda1也就是挂载点&#x2F;mnt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%AE%89%E8%A3%85%E5%AE%8C%E6%88%90%E4%B9%8B%E5%90%8E%E9%9C%80%E7%94%9F%E6%88%90fstab%E6%96%87%E4%BB%B6"><span class="toc-number">6.4.</span> <span class="toc-text">4. 安装完成之后需生成fstab文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E5%88%87%E6%8D%A2%E7%8E%AF%E5%A2%83"><span class="toc-number">7.</span> <span class="toc-text">7. 切换环境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%87%E6%8D%A2%E5%88%B0%E5%88%9A%E5%88%9A%E5%AE%89%E8%A3%85%E5%A5%BD%E7%9A%84%E7%B3%BB%E7%BB%9F"><span class="toc-number">7.1.</span> <span class="toc-text">1. 切换到刚刚安装好的系统</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%85%8D%E7%BD%AE%E6%97%B6%E5%8C%BA"><span class="toc-number">7.2.</span> <span class="toc-text">2. 配置时区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%AE%BE%E7%BD%AE%E7%A1%AC%E4%BB%B6%E6%97%B6%E9%97%B4"><span class="toc-number">7.3.</span> <span class="toc-text">3. 设置硬件时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%AE%89%E8%A3%85vim-%E6%88%91%E4%B9%A0%E6%83%AF%E4%BA%86%E4%BD%BF%E7%94%A8vim%E7%BC%96%E8%BE%91"><span class="toc-number">7.4.</span> <span class="toc-text">4. 安装vim(我习惯了使用vim编辑)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E8%AE%BE%E7%BD%AE%E8%AF%AD%E8%A8%80"><span class="toc-number">7.5.</span> <span class="toc-text">5. 设置语言</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%B0%86-etc-locale-gen%E4%B8%ADen-US-UTF-8%E5%92%8Czh-CN-UTF-8%E7%9A%84%E6%B3%A8%E9%87%8A%E5%8E%BB%E6%8E%89"><span class="toc-number">7.5.1.</span> <span class="toc-text">1. 将&#x2F;etc&#x2F;locale.gen中en_US.UTF-8和zh_CN.UTF-8的注释去掉</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E7%84%B6%E5%90%8E%E7%94%9F%E6%88%90%E4%B8%80%E4%B8%8B"><span class="toc-number">7.5.2.</span> <span class="toc-text">2. 然后生成一下</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%85%8D%E7%BD%AE-etc-locale-conf%E6%96%87%E4%BB%B6"><span class="toc-number">7.5.3.</span> <span class="toc-text">3. 配置 &#x2F;etc&#x2F;locale.conf文件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E8%AE%BE%E7%BD%AEroot%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81"><span class="toc-number">7.6.</span> <span class="toc-text">6. 设置root用户密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%AE%89%E8%A3%85%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3%E7%9A%84%E5%8C%85"><span class="toc-number">7.7.</span> <span class="toc-text">7. 安装网络相关的包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E6%8C%89%E8%A3%85cpu%E7%BC%96%E7%A0%81"><span class="toc-number">7.8.</span> <span class="toc-text">8. 按装cpu编码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E5%AE%89%E8%A3%85%E5%BC%95%E5%AF%BC"><span class="toc-number">7.9.</span> <span class="toc-text">9. 安装引导</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-%E7%BB%99%E4%BD%A0%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%8F%96%E4%B8%AA%E5%90%8D%E5%AD%97"><span class="toc-number">7.10.</span> <span class="toc-text">10. 给你的系统取个名字</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E5%BC%80%E5%A7%8B%E6%8C%89%E8%A3%85kde-plasma"><span class="toc-number">8.</span> <span class="toc-text">8. 开始按装kde-plasma</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%89%E8%A3%85Xorg"><span class="toc-number">8.1.</span> <span class="toc-text">1. 安装Xorg</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85%E8%A7%A6%E6%91%B8%E6%9D%BF%E9%A9%B1%E5%8A%A8"><span class="toc-number">8.2.</span> <span class="toc-text">2. 安装触摸板驱动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AE%89%E8%A3%85%E5%AD%97%E4%BD%93"><span class="toc-number">8.3.</span> <span class="toc-text">3. 安装字体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="toc-number">8.4.</span> <span class="toc-text">4. 创建用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85%E6%A1%8C%E9%9D%A2"><span class="toc-number">8.5.</span> <span class="toc-text">5. 开始安装桌面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%89%E8%A3%85%E6%A1%8C%E9%9D%A2%E5%8F%8A%E5%9F%BA%E6%9C%AC%E5%BA%94%E7%94%A8"><span class="toc-number">8.6.</span> <span class="toc-text">1. 安装桌面及基本应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%BF%80%E6%B4%BB%E7%99%BB%E5%BD%95%E7%AA%97%E5%8F%A3sddm"><span class="toc-number">8.7.</span> <span class="toc-text">2. 激活登录窗口sddm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AE%89%E8%A3%85%E5%A3%B0%E9%9F%B3"><span class="toc-number">8.8.</span> <span class="toc-text">3. 安装声音</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B6%E4%BB%96"><span class="toc-number">8.9.</span> <span class="toc-text">4. 其他</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E9%80%80%E5%87%BA%E5%BD%93%E5%89%8D%E7%8E%AF%E5%A2%83"><span class="toc-number">9.</span> <span class="toc-text">9. 退出当前环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E5%8D%B8%E8%BD%BD%E5%88%86%E5%8C%BA"><span class="toc-number">10.</span> <span class="toc-text">10. 卸载分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-%E9%87%8D%E5%90%AF"><span class="toc-number">11.</span> <span class="toc-text">11. 重启</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&text=ArchLinux安装(BIOS)"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&is_video=false&description=ArchLinux安装(BIOS)"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=ArchLinux安装(BIOS)&body=Check out this article: https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&title=ArchLinux安装(BIOS)"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&name=ArchLinux安装(BIOS)&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/03/10/ArchLinux%E5%AE%89%E8%A3%85/&t=ArchLinux安装(BIOS)"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    KainHuck
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

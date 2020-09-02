@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="归并排序算法流程并归排序采用的是分治的思想,先将乱序的数组逐级拆分成一个个小部分,最底层每个部分长度为一(各个部分视为有序),然后在将有序的部分按照完全二叉树两两合并逐级往上,直到排序结束 参考如下图片(来源:https:&#x2F;&#x2F;www.cnblogs.com&#x2F;chengxiao&#x2F;p&#x2F;6194356.html)  每部分的合并规则如下:  用golang实现1234567891011121314151">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang-归并排序">
+<meta property="og:url" content="https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/index.html">
+<meta property="og:site_name" content="Kainhuck&#39;s blog">
+<meta property="og:description" content="归并排序算法流程并归排序采用的是分治的思想,先将乱序的数组逐级拆分成一个个小部分,最底层每个部分长度为一(各个部分视为有序),然后在将有序的部分按照完全二叉树两两合并逐级往上,直到排序结束 参考如下图片(来源:https:&#x2F;&#x2F;www.cnblogs.com&#x2F;chengxiao&#x2F;p&#x2F;6194356.html)  每部分的合并规则如下:  用golang实现1234567891011121314151">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://kainhuck.github.io/images/fenzhi_1.png">
+<meta property="og:image" content="https://kainhuck.github.io/images/guibin_1.png">
+<meta property="article:published_time" content="2020-05-26T07:08:25.000Z">
+<meta property="article:modified_time" content="2020-09-02T08:29:48.426Z">
+<meta property="article:author" content="KainHuck">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kainhuck.github.io/images/fenzhi_1.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>golang-归并排序</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/05/26/python-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2020/05/26/golang-channel/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&text=golang-归并排序"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&is_video=false&description=golang-归并排序"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=golang-归并排序&body=Check out this article: https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&name=golang-归并排序&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&t=golang-归并排序"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">归并排序算法流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8golang%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">用golang实现</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        golang-归并排序
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kainhuck's blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-05-26T07:08:25.000Z" itemprop="datePublished">2020-05-26</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/golang/" rel="tag">golang</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="归并排序算法流程"><a href="#归并排序算法流程" class="headerlink" title="归并排序算法流程"></a>归并排序算法流程</h2><p>并归排序采用的是分治的思想,先将乱序的数组逐级拆分成一个个小部分,最底层每个部分长度为一(各个部分视为有序),然后在将有序的部分按照完全二叉树两两合并逐级往上,直到排序结束</p>
+<p>参考如下图片(来源:<a target="_blank" rel="noopener" href="https://www.cnblogs.com/chengxiao/p/6194356.html">https://www.cnblogs.com/chengxiao/p/6194356.html</a>)</p>
+<p><img src="/images/fenzhi_1.png" alt="img"></p>
+<p>每部分的合并规则如下:</p>
+<p><img src="/images/guibin_1.png" alt="img"></p>
+<h2 id="用golang实现"><a href="#用golang实现" class="headerlink" title="用golang实现"></a>用golang实现</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MergeSort</span><span class="params">(intList []<span class="keyword">int</span>)</span> []<span class="title">int</span></span> &#123;</span><br><span class="line">	length := <span class="built_in">len</span>(intList)</span><br><span class="line">	<span class="comment">// 长度为0直接退出</span></span><br><span class="line">	<span class="keyword">if</span> length &lt;= <span class="number">1</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> intList</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 先分</span></span><br><span class="line">	middle := length / <span class="number">2</span></span><br><span class="line">	left := MergeSort(intList[:middle])</span><br><span class="line">	right := MergeSort(intList[middle:])</span><br><span class="line">	<span class="comment">// 后治</span></span><br><span class="line">	<span class="keyword">return</span> merge(left, right)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">merge</span><span class="params">(left, right []<span class="keyword">int</span>)</span> []<span class="title">int</span></span> &#123;</span><br><span class="line">	leftLen := <span class="built_in">len</span>(left)</span><br><span class="line">	rightLen := <span class="built_in">len</span>(right)</span><br><span class="line">	<span class="comment">// 定义i,j指针指向left,right的,开始</span></span><br><span class="line">	i, j := <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">	<span class="comment">// 定义临时切片</span></span><br><span class="line">	temp := <span class="built_in">make</span>([]<span class="keyword">int</span>,<span class="number">0</span>)</span><br><span class="line">	<span class="keyword">for</span> i &lt; leftLen &amp;&amp; j &lt; rightLen &#123;</span><br><span class="line">		<span class="keyword">if</span> left[i] &lt; right[j] &#123;</span><br><span class="line">			<span class="comment">// 将左边的值放入temp</span></span><br><span class="line">			temp =<span class="built_in">append</span>(temp, left[i])</span><br><span class="line">			<span class="comment">// i++</span></span><br><span class="line">			i++</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="comment">// 将右边的值放入temp</span></span><br><span class="line">			temp =<span class="built_in">append</span>(temp, right[j])</span><br><span class="line">			<span class="comment">// j++</span></span><br><span class="line">			j++</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 结束循环后会多有一个切片有余</span></span><br><span class="line">	<span class="keyword">if</span> i &lt; leftLen &#123;</span><br><span class="line">		<span class="comment">// 如果左边有余</span></span><br><span class="line">		temp = <span class="built_in">append</span>(temp, left[i:]...)</span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> j &lt; rightLen &#123;</span><br><span class="line">		<span class="comment">// 如果右边有余</span></span><br><span class="line">		temp = <span class="built_in">append</span>(temp, right[j:]...)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> temp</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">归并排序算法流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8golang%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">用golang实现</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&text=golang-归并排序"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&is_video=false&description=golang-归并排序"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=golang-归并排序&body=Check out this article: https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&title=golang-归并排序"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&name=golang-归并排序&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/05/26/golang-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/&t=golang-归并排序"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    KainHuck
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

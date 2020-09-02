@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="go语言中的引用类型(我更愿意称其为指向类型)其实就是存放地址的类型,比如slice,map,channel,和其他指针类型(*int…) 要实用这些(存放地址的)类型之前就必须要为其分配内存.下面我一一举例说明一下(以下操作均在函数内部操作,意味着可以使用:&#x3D;来声明定义变量) 1. 值类型的指针形式以int为例  一个错误的例子 12var i *int*i &#x3D; 1  panic: runtim">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang-引用类型与地址">
+<meta property="og:url" content="https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/index.html">
+<meta property="og:site_name" content="Kainhuck&#39;s blog">
+<meta property="og:description" content="go语言中的引用类型(我更愿意称其为指向类型)其实就是存放地址的类型,比如slice,map,channel,和其他指针类型(*int…) 要实用这些(存放地址的)类型之前就必须要为其分配内存.下面我一一举例说明一下(以下操作均在函数内部操作,意味着可以使用:&#x3D;来声明定义变量) 1. 值类型的指针形式以int为例  一个错误的例子 12var i *int*i &#x3D; 1  panic: runtim">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-25T03:55:09.000Z">
+<meta property="article:modified_time" content="2020-09-02T08:29:48.426Z">
+<meta property="article:author" content="KainHuck">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>golang-引用类型与地址</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/05/26/golang-%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2020/03/12/ArchLinux%E5%AE%89%E8%A3%85%E5%90%8E%E7%9A%84%E9%85%8D%E7%BD%AE/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&text=golang-引用类型与地址"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&is_video=false&description=golang-引用类型与地址"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=golang-引用类型与地址&body=Check out this article: https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&name=golang-引用类型与地址&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&t=golang-引用类型与地址"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%80%BC%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%8C%87%E9%92%88%E5%BD%A2%E5%BC%8F"><span class="toc-number">1.</span> <span class="toc-text">1. 值类型的指针形式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Slice"><span class="toc-number">2.</span> <span class="toc-text">2. Slice</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-map"><span class="toc-number">3.</span> <span class="toc-text">3. map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-channel"><span class="toc-number">4.</span> <span class="toc-text">4. channel</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        golang-引用类型与地址
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kainhuck's blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-05-25T03:55:09.000Z" itemprop="datePublished">2020-05-25</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">编程语言</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/golang/" rel="tag">golang</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>go语言中的<code>引用类型</code>(我更愿意称其为<code>指向类型</code>)其实就是<code>存放地址的类型</code>,比如<code>slice</code>,<code>map</code>,<code>channel</code>,和其他指针类型(<code>*int</code>…)</p>
+<p>要实用这些(存放地址的)类型之前就必须要为其分配<code>内存</code>.下面我一一举例说明一下(以下操作均在函数内部操作,意味着可以使用<code>:=</code>来声明定义变量)</p>
+<h2 id="1-值类型的指针形式"><a href="#1-值类型的指针形式" class="headerlink" title="1. 值类型的指针形式"></a>1. 值类型的指针形式</h2><p><em>以int为例</em></p>
+<ul>
+<li><p>一个错误的例子</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i *<span class="keyword">int</span></span><br><span class="line">*i = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>panic: runtime error: invalid memory address or nil pointer dereference</p>
+<p>错误原因,i为指针变量,但是未被分配地址就试图操作其内容</p>
+</li>
+<li><p>解决方法(写法一)</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i *<span class="keyword">int</span></span><br><span class="line">i = <span class="built_in">new</span>(<span class="keyword">int</span>)</span><br><span class="line">*i = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解决方法(写法二)</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">i := <span class="built_in">new</span>(<span class="keyword">int</span>)</span><br><span class="line">*i = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>new函数</p>
+<p>new函数用于给本身不带有指针类型的类型带上指针,这话是我给出的解释,说白了就是输入<code>值类型</code>返回<code>该类型的指针</code>.new函数可以分配内存并且初始化为零值.这是他的函数定义:<code>func new(Type) *Type</code></p>
+</li>
+</ul>
+<h2 id="2-Slice"><a href="#2-Slice" class="headerlink" title="2. Slice"></a>2. Slice</h2><p>slice本身就是一个带指针的类型(引用类型),所以使用他之前必须分配地址,但他比较特殊,由于<code>append</code>函数的功能,我们几乎不会遇到<code>slice</code>内存未分配的函数,更多的是遇到下标越界</p>
+<ul>
+<li><p>声明时为分配内存的例子一</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s []<span class="keyword">int</span>	<span class="comment">// 定义一个存放int的切片,未分配内存</span></span><br><span class="line">s[<span class="number">0</span>] = <span class="number">1</span> <span class="comment">// 报错,panic: runtime error: index out of range [0] with length 0</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>声明时为分配内存的例子二</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s []<span class="keyword">int</span> <span class="comment">// 定义一个存放int的切片,未分配内存</span></span><br><span class="line">s = <span class="built_in">append</span>(s, <span class="number">1</span>) <span class="comment">// 未报错</span></span><br></pre></td></tr></table></figure>
+
+<p>有些人可能会感到奇怪,这里明明没有分配内存怎么可以使用slice而不报错,原因就是,append函数会自动分配内存(其实就是扩容策略,没有发生下标越界错误也是因为扩容策略),这是append函数的文档:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The append built-in function appends elements to the end of a slice. If</span></span><br><span class="line"><span class="comment">// it has sufficient capacity, the destination is resliced to accommodate the</span></span><br><span class="line"><span class="comment">// new elements. If it does not, a new underlying array will be allocated.</span></span><br><span class="line"><span class="comment">// Append returns the updated slice. It is therefore necessary to store the</span></span><br><span class="line"><span class="comment">// result of append, often in the variable holding the slice itself:</span></span><br><span class="line"><span class="comment">//	slice = append(slice, elem1, elem2)</span></span><br><span class="line"><span class="comment">//	slice = append(slice, anotherSlice...)</span></span><br><span class="line"><span class="comment">// As a special case, it is legal to append a string to a byte slice, like this:</span></span><br><span class="line"><span class="comment">//	slice = append([]byte(&quot;hello &quot;), &quot;world&quot;...)</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">append</span><span class="params">(slice []Type, elems ...Type)</span> []<span class="title">Type</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>make函数对于slice</p>
+<p>make函数是用于对<code>slice</code>,<code>map</code>,<code>channell</code>专属的内存分配函数,它的返回值是类型本身,因为这三种类型本身带有指针,另外make函数对这三种类型有智能的判断,对slice来说,make函数是这种样子<code>make(sliceType, length int, capacity int)sliceType</code>,它接受三个参数,分别是切片类型,长度,和容量,其中容量可以省略(和length相同),如果length大于0, 则已经被分配的空间会先存放类型零值.</p>
+</li>
+<li><p>声明时分配内存的写法一</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s []<span class="keyword">int</span></span><br><span class="line">s = <span class="built_in">make</span>([]<span class="keyword">int</span>,<span class="number">0</span>)</span><br><span class="line">fmt.Println(s) <span class="comment">// []</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> s []<span class="keyword">int</span></span><br><span class="line">s = <span class="built_in">make</span>([]<span class="keyword">int</span>,<span class="number">3</span>)</span><br><span class="line">fmt.Println(s) <span class="comment">// [0 0 0]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>声明时分配内存的写法二</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>不使用make函数分配内存的写法</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s := []<span class="keyword">int</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法只能用于<code>:=</code>,其实就是通过<code>&#123;&#125;</code>来事先初始化,已经初始化了,肯定也就分配内存了,只不过上面的写法是初始化为空的初始化,再举个例子更好的帮大家理解一下</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s := []<span class="keyword">int</span>&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="3-map"><a href="#3-map" class="headerlink" title="3. map"></a>3. map</h2><p>如slice一样,map也是一个带指针的类型(引用类型)</p>
+<ul>
+<li><p>一个错误的例子</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> m <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">m[<span class="string">&quot;age&quot;</span>] = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>panic: assignment to entry in nil map</p>
+<p>错误原因:map是引用类型,未分配内存便尝试操作其中的内容</p>
+</li>
+<li><p>make函数对于map</p>
+<p>和slice不同,make函数对于map是这样子的<code>make(mapType, capacity int)mapType</code>,它只接受两个参数分别是map类型和容量,如果传递多个参数会编译时报错,和slice一样capacity可以被省略.<strong>值得注意的是虽然第二个值是容量,但是map并不能使用<code>cap</code>函数获取其容量,而且通过<code>len</code>函数获得是map的长度而不是容量</strong>,举个例子说明一下</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">m := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;, <span class="number">10</span>)</span><br><span class="line">fmt.Println(<span class="built_in">len</span>(m)) <span class="comment">// 0</span></span><br><span class="line">m[<span class="string">&quot;name&quot;</span>] = <span class="string">&quot;horika&quot;</span></span><br><span class="line"><span class="comment">// fmt.Println(cap(m))  // panic</span></span><br><span class="line">fmt.Println(<span class="built_in">len</span>(m)) <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过make函数给map分配内存写法一</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> m <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span></span><br><span class="line">m = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>, <span class="number">1</span>) <span class="comment">// 容量可以被省略 m = make(map[string]string)</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过make函数给map分配内存写法二</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">int</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>不通过make函数分配内存的写法</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m := <span class="keyword">map</span>[<span class="keyword">int</span>][<span class="keyword">int</span>]&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>原理和slice的这种写法一样,通过<code>:=</code>和<code>&#123;&#125;</code>来进行初始化,一旦被初始化了,也就被分配内存了.举个初始化不为空的例子:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">m := <span class="keyword">map</span>[<span class="keyword">int</span>]<span class="keyword">int</span>&#123;</span><br><span class="line">	<span class="number">1</span>: <span class="number">1</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="4-channel"><a href="#4-channel" class="headerlink" title="4. channel"></a>4. channel</h2><p>在go语言中channel是为了<code>goroutine</code>的通信,他也是一种引用类型.<code>channel</code>的使用必须通过<code>make</code>函数分配内存.</p>
+<ul>
+<li><p>一个错误的例子一</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c <span class="keyword">chan</span> <span class="keyword">int</span> <span class="comment">// 定义一个传递int的通道</span></span><br><span class="line"><span class="keyword">go</span> printI(c)   <span class="comment">// 尝试向一个为分配内存的通道取值; 这是事先定义的接收一个int通道的函数,</span></span><br><span class="line">			   <span class="comment">// 如果没有这一句下面的操作会堵塞,因为为分配的通道肯定是没有缓冲的</span></span><br><span class="line">c &lt;- <span class="number">1</span>		   <span class="comment">// 尝试向一个没有分配内存的通道传值</span></span><br></pre></td></tr></table></figure>
+
+<p>无论是传值还是取值都会报错</p>
+<p>goroutine 1 [chan send (nil chan)]:</p>
+<p>goroutine 18 [chan receive (nil chan)]:</p>
+</li>
+<li><p>一个错误的例子二</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c <span class="keyword">chan</span> <span class="keyword">int</span> <span class="comment">// 定义一个传递int的通道</span></span><br><span class="line"><span class="built_in">close</span>(c)	   <span class="comment">// 尝试关闭一个没有分配内存的通道</span></span><br></pre></td></tr></table></figure>
+
+<p>panic: close of nil channel</p>
+<p>如果关闭一个没有没有分配内存的通道也会报错</p>
+</li>
+<li><p>make函数对于channel</p>
+<p>与以上两种类型都不同make函数对于channel是这样的<code>make(chanType, buffer int)chanType</code>,它接收两个参数,第一个是通道的类型,第二个是缓冲大小(省略则是无缓冲通道).</p>
+</li>
+<li><p>改正上述例子</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line"><span class="keyword">go</span> printI(c)</span><br><span class="line">c &lt;- <span class="number">1</span></span><br><span class="line"><span class="built_in">close</span>(c)</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> c <span class="keyword">chan</span> <span class="keyword">int</span></span><br><span class="line">c = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line"><span class="keyword">go</span> printI(c)</span><br><span class="line">c &lt;- <span class="number">1</span></span><br><span class="line"><span class="built_in">close</span>(c)</span><br></pre></td></tr></table></figure>
+
+<p>当然如果带有缓冲,传值时就不怕阻塞了</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">1</span>)</span><br><span class="line">c &lt;- <span class="number">1</span></span><br><span class="line"><span class="built_in">close</span>(c)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%80%BC%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%8C%87%E9%92%88%E5%BD%A2%E5%BC%8F"><span class="toc-number">1.</span> <span class="toc-text">1. 值类型的指针形式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Slice"><span class="toc-number">2.</span> <span class="toc-text">2. Slice</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-map"><span class="toc-number">3.</span> <span class="toc-text">3. map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-channel"><span class="toc-number">4.</span> <span class="toc-text">4. channel</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&text=golang-引用类型与地址"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&is_video=false&description=golang-引用类型与地址"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=golang-引用类型与地址&body=Check out this article: https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&title=golang-引用类型与地址"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&name=golang-引用类型与地址&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/05/25/golang-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9D%80/&t=golang-引用类型与地址"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    KainHuck
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
