@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="redis数据类型即操作1. 字符串 set 设置字符串 格式: set key value 例子: set name kainhuck  get 获取字符串的值 格式: get key 例子: get name  incr 对值做加一操作 要求: 该字符串为数字字符串 格式: incr key 例子: incr age  inrcby 对值加指定值 要求: 该字符串为数字字符串 格式: incr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis 常用操作">
+<meta property="og:url" content="https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="Kainhuck&#39;s blog">
+<meta property="og:description" content="redis数据类型即操作1. 字符串 set 设置字符串 格式: set key value 例子: set name kainhuck  get 获取字符串的值 格式: get key 例子: get name  incr 对值做加一操作 要求: 该字符串为数字字符串 格式: incr key 例子: incr age  inrcby 对值加指定值 要求: 该字符串为数字字符串 格式: incr">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-02-10T13:10:47.000Z">
+<meta property="article:modified_time" content="2020-09-02T09:08:27.680Z">
+<meta property="article:author" content="KainHuck">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>redis 常用操作</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/02/10/redis-conf-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2019/12/16/linux%E4%B8%AD%E7%94%B1sda%E5%8F%98sdb%E5%BC%95%E8%B5%B7%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&text=redis 常用操作"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&is_video=false&description=redis 常用操作"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=redis 常用操作&body=Check out this article: https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&name=redis 常用操作&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&t=redis 常用操作"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8D%B3%E6%93%8D%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">redis数据类型即操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-number">1.1.</span> <span class="toc-text">1. 字符串</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-hash"><span class="toc-number">1.2.</span> <span class="toc-text">2.hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E9%93%BE%E8%A1%A8"><span class="toc-number">1.3.</span> <span class="toc-text">3.链表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E9%9B%86%E5%90%88"><span class="toc-number">1.4.</span> <span class="toc-text">4.集合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88"><span class="toc-number">1.5.</span> <span class="toc-text">5.有序集合</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        redis 常用操作
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kainhuck's blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-02-10T13:10:47.000Z" itemprop="datePublished">2020-02-10</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/redis/" rel="tag">redis</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="redis数据类型即操作"><a href="#redis数据类型即操作" class="headerlink" title="redis数据类型即操作"></a>redis数据类型即操作</h2><h3 id="1-字符串"><a href="#1-字符串" class="headerlink" title="1. 字符串"></a>1. 字符串</h3><ul>
+<li><p><strong>set</strong></p>
+<p>设置字符串</p>
+<p>格式: set key value</p>
+<p>例子: set name kainhuck</p>
+</li>
+<li><p><strong>get</strong></p>
+<p>获取字符串的值</p>
+<p>格式: get key</p>
+<p>例子: get name</p>
+</li>
+<li><p><strong>incr</strong></p>
+<p>对值做加一操作</p>
+<p>要求: 该字符串为数字字符串</p>
+<p>格式: incr key</p>
+<p>例子: incr age</p>
+</li>
+<li><p><strong>inrcby</strong></p>
+<p>对值加指定值</p>
+<p>要求: 该字符串为数字字符串</p>
+<p>格式: incrby key num</p>
+<p>例子: incrby age 50</p>
+</li>
+</ul>
+<h3 id="2-hash"><a href="#2-hash" class="headerlink" title="2.hash"></a>2.hash</h3><p>类似Python中的字典</p>
+<ul>
+<li><p><strong>hset</strong></p>
+<p>设置哈希的一组key和value</p>
+<p>格式: hset hashname key value</p>
+<p>例子: hset user:01 name kainhuck</p>
+<p>例子: hset user:01 age 18</p>
+</li>
+<li><p><strong>hget</strong></p>
+<p>获取哈希一组key对应的value</p>
+<p>格式: hget hashname key</p>
+<p>例子: hget user:01 name</p>
+</li>
+<li><p><strong>hmset</strong></p>
+<p>设置哈希的多组key和value</p>
+<p>格式: hmset hashname key1 value1 key2 value2 ….</p>
+<p>例子: hmset user:01 name kainhuck age 18</p>
+</li>
+<li><p><strong>hmget</strong></p>
+<p>获取哈希多组key对应的value</p>
+<p>格式: hmget hashname key1 key2 …</p>
+<p>例子: hmget user:01 name age</p>
+</li>
+<li><p><strong>hgetall</strong></p>
+<p>获取哈希所有key对应的value</p>
+<p>格式: hgetall hashname</p>
+<p>例子: hgetall user:01</p>
+</li>
+</ul>
+<h3 id="3-链表"><a href="#3-链表" class="headerlink" title="3.链表"></a>3.链表</h3><ul>
+<li><p><strong>lpush</strong></p>
+<p>从左边向链表添加元素</p>
+<p>格式: lpush listname value</p>
+<p>例子: lpush namelist kainhuck</p>
+</li>
+<li><p><strong>lrange</strong></p>
+<p>获取链表中的数据</p>
+<p>格式: lrange listname start end</p>
+<p>格式: lrange namelist 0 -1</p>
+</li>
+<li><p><strong>rpush</strong></p>
+<p>从右边向链表添加元素</p>
+<p>格式: rpush listname value</p>
+<p>例子: rpush namelist kainhuck</p>
+</li>
+<li><p><strong>ltrim</strong></p>
+<p>截取链表,删除其他</p>
+<p>格式: ltrim listname start end</p>
+<p>例子: ltrim namelist 0 1</p>
+</li>
+<li><p><strong>lpop</strong></p>
+<p>从左边将链表元素弹出</p>
+<p>格式: lpop listname</p>
+<p>例子: lpop namelist</p>
+</li>
+<li><p><strong>llen</strong></p>
+<p>获取链表长度</p>
+<p>格式: llen listname</p>
+<p>例子: llen namelist</p>
+</li>
+</ul>
+<h3 id="4-集合"><a href="#4-集合" class="headerlink" title="4.集合"></a>4.集合</h3><ul>
+<li><p><strong>sadd</strong></p>
+<p>向集合中添加元素</p>
+<p>格式: sadd setname value</p>
+<p>例子: sadd idset 1</p>
+</li>
+<li><p><strong>smembers</strong></p>
+<p>获取集合元素</p>
+<p>格式: smembers setname </p>
+<p>例子: smembers idset</p>
+</li>
+<li><p><strong>sdiff</strong></p>
+<p>获取集合差集(集合1中存在,集合2中不存在)</p>
+<p>格式: sdiff setname1 setname2</p>
+<p>例子: sdiff set1 set2</p>
+</li>
+<li><p><strong>sinter</strong></p>
+<p>获取交集</p>
+<p>格式: sdiff setname1 setname2</p>
+<p>例子: sdiff set1 set2</p>
+</li>
+<li><p><strong>sunion</strong></p>
+<p>获取并集</p>
+<p>格式: sunion setname1 setname2</p>
+<p>例子: sunion set1 set2</p>
+</li>
+<li><p><strong>scard</strong></p>
+<p>获取集合中的元素个数</p>
+<p>格式: scard setname</p>
+<p>例子: scard set1</p>
+</li>
+</ul>
+<h3 id="5-有序集合"><a href="#5-有序集合" class="headerlink" title="5.有序集合"></a>5.有序集合</h3><p>元素由两部分组成: 序号和值</p>
+<p>取出有序集合里面的元素时,要根据序号排序,取出</p>
+<ul>
+<li><p><strong>zadd</strong></p>
+<p>向有序集合中添加元素,默认是升序排列</p>
+<p>格式: zadd zsetname number value</p>
+<p>例子: zadd zset 10 kainhuck</p>
+<p>例子: zadd zset 12 hahaha</p>
+</li>
+<li><p><strong>zrange</strong></p>
+<p>按序号升序获取有序集合内容</p>
+<p>格式: zrange zsetname start end</p>
+<p>例子: zrange zset 0 -1</p>
+</li>
+<li><p><strong>zrevrange</strong></p>
+<p>按序号降序获取有序集合内容</p>
+<p>格式: zrevrange zsetname start end</p>
+<p>例子: zrevrange zset 0 -1</p>
+</li>
+<li><p><strong>zcard</strong></p>
+<p>获取有序集合长度</p>
+<p>格式: zcard zsetname</p>
+<p>例子: zcard zset</p>
+</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8D%B3%E6%93%8D%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">redis数据类型即操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-number">1.1.</span> <span class="toc-text">1. 字符串</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-hash"><span class="toc-number">1.2.</span> <span class="toc-text">2.hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E9%93%BE%E8%A1%A8"><span class="toc-number">1.3.</span> <span class="toc-text">3.链表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E9%9B%86%E5%90%88"><span class="toc-number">1.4.</span> <span class="toc-text">4.集合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88"><span class="toc-number">1.5.</span> <span class="toc-text">5.有序集合</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&text=redis 常用操作"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&is_video=false&description=redis 常用操作"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=redis 常用操作&body=Check out this article: https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&title=redis 常用操作"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&name=redis 常用操作&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2020/02/10/redis-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/&t=redis 常用操作"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    KainHuck
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
