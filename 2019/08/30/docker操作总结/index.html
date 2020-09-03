@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Docker 总结1. 说在前头(Docker命令的格式)docker中的对象分为4个(就目前我所学到的)  镜像  image 容器  container 网络  network 数据卷 volume  docker 对不同对象的操作格式为 docker (对象类型) (命令) [参数] (对象名) 比如,删除一个名为mysql的容器 docker container rm mysql 这些命令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker操作总结">
+<meta property="og:url" content="https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Kainhuck&#39;s blog">
+<meta property="og:description" content="Docker 总结1. 说在前头(Docker命令的格式)docker中的对象分为4个(就目前我所学到的)  镜像  image 容器  container 网络  network 数据卷 volume  docker 对不同对象的操作格式为 docker (对象类型) (命令) [参数] (对象名) 比如,删除一个名为mysql的容器 docker container rm mysql 这些命令">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-08-30T02:16:00.000Z">
+<meta property="article:modified_time" content="2020-09-03T06:31:35.246Z">
+<meta property="article:author" content="KainHuck">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>docker操作总结</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2019/08/31/redis%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2019/07/27/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB%E4%B9%8B%E5%A3%B0%E6%98%8E%E5%8D%8F%E8%AE%AE/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&text=docker操作总结"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&is_video=false&description=docker操作总结"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=docker操作总结&body=Check out this article: https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&name=docker操作总结&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&t=docker操作总结"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">Docker 总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AF%B4%E5%9C%A8%E5%89%8D%E5%A4%B4-Docker%E5%91%BD%E4%BB%A4%E7%9A%84%E6%A0%BC%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">1. 说在前头(Docker命令的格式)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%B9%E5%99%A8"><span class="toc-number">3.</span> <span class="toc-text">2.容器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8"><span class="toc-number">3.1.</span> <span class="toc-text">创建容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E5%85%A5%E5%AE%B9%E5%99%A8"><span class="toc-number">3.2.</span> <span class="toc-text">进入容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF"><span class="toc-number">3.3.</span> <span class="toc-text">查看容器详细信息</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C"><span class="toc-number">4.</span> <span class="toc-text">网络</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="toc-number">5.</span> <span class="toc-text">数据卷</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        docker操作总结
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kainhuck's blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-08-30T02:16:00.000Z" itemprop="datePublished">2019-08-30</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/">容器技术</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/docker/" rel="tag">docker</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Docker-总结"><a href="#Docker-总结" class="headerlink" title="Docker 总结"></a>Docker 总结</h2><h2 id="1-说在前头-Docker命令的格式"><a href="#1-说在前头-Docker命令的格式" class="headerlink" title="1. 说在前头(Docker命令的格式)"></a>1. 说在前头(Docker命令的格式)</h2><p>docker中的对象分为4个(就目前我所学到的)</p>
+<ol>
+<li>镜像  image</li>
+<li>容器  container</li>
+<li>网络  network</li>
+<li>数据卷 volume</li>
+</ol>
+<p>docker 对不同对象的操作格式为</p>
+<p>docker (对象类型) (命令) [参数] (对象名)</p>
+<p>比如,删除一个名为mysql的容器</p>
+<p><code>docker container rm mysql</code></p>
+<p>这些命令有:</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>rm</td>
+<td>删除</td>
+</tr>
+<tr>
+<td>inspect</td>
+<td>查看详细信息</td>
+</tr>
+<tr>
+<td>start</td>
+<td>启动容器</td>
+</tr>
+<tr>
+<td>stop</td>
+<td>关闭容器</td>
+</tr>
+<tr>
+<td>create</td>
+<td>创建</td>
+</tr>
+<tr>
+<td>ls</td>
+<td>列出</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-容器"><a href="#2-容器" class="headerlink" title="2.容器"></a>2.容器</h2><h3 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h3><p>创建并运行一个容器的命令为</p>
+<p><code>docker run --name [名字] -d 镜像名:标签 一些要执行的命令</code></p>
+<p>如果不加执行命令,容器会执行dockerfile里指定的命令(如果存在)</p>
+<p>比如:</p>
+<p><code>docker run --name mysql -d mysql:5.7</code></p>
+<p>这里基于mysql 5.7创建了一个容器并取名为mysql,并且使其后台运行(-d)</p>
+<p>镜像名后不跟标签默认为latest</p>
+<hr>
+<p>将<code>run</code>改成<code>create</code>则为创建容器不运行</p>
+<p>用<code>start</code>命令启动容器</p>
+<p>用<code>stop</code>命令停止容器</p>
+<hr>
+<p>列举一些参数</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>功能</th>
+<th>列举</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>–name</td>
+<td>给容器取名字</td>
+<td>–name mysql</td>
+</tr>
+<tr>
+<td>-d</td>
+<td>后台运行容器</td>
+<td>-d</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>指定环境变量</td>
+<td>-e MYSQL_ROOT_PASSWORD=123</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>设置数据卷</td>
+<td>-v mysql:/var/lib/mysql</td>
+</tr>
+<tr>
+<td>–network</td>
+<td>这是网络(默认bridge)</td>
+<td>–network host</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>映射端口</td>
+<td>-p 80:80</td>
+</tr>
+<tr>
+<td>-P</td>
+<td>映射所有开放端口到本地(随机)</td>
+<td>-P</td>
+</tr>
+<tr>
+<td>–link</td>
+<td>连接到某个已存在的容器,方便使用容器名访问</td>
+<td>–link mysql</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h3><p>常用命令为</p>
+<p><code>docker exec -it 容器名 /bin/bash</code></p>
+<p><code>exec</code>为执行命令的命令</p>
+<p><code>-it</code>就是 <code>-i</code>和<code>-t</code> ,<code>-i</code>表示标准输入保持打开,<code>-t</code>表示分配一个伪终端</p>
+<p>这里执行的命令为<code>/bin/bash</code>,一般的容器都带有<code>bash</code>,有些则用<code>sh</code></p>
+<h3 id="查看容器详细信息"><a href="#查看容器详细信息" class="headerlink" title="查看容器详细信息"></a>查看容器详细信息</h3><p><code>docker container inspect 容器名</code></p>
+<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><p>通过命令<code>docker network ls 可以查看</code>当前拥有哪些网络类型,通常有一下几种:</p>
+<ol>
+<li>bridge 桥类型,也是默认类型,默认只能通过ip平通</li>
+<li>host 主机类型,和主机共享网络,这样就不必使用端口映射</li>
+<li>none   不指定任何网卡,只有lo</li>
+</ol>
+<p>使用<code>bridge</code>的两个网络通过ip可以ping通.若使用–link来创建容器时可以通过容器名ping通,但这是单向的,例:</p>
+<p>已存在容器a,创建容器b时指定<code>--link a</code>则在容器b使用命令<code>ping a</code>可以ping通,在a里使用命令<code>ping b</code>则不行</p>
+<p>一种特殊情况,</p>
+<p>可以创建一个自己的网络指定类型为<code>bridge</code>,再创建几个容器连接到自己创建的网络上,则这些容器可以通过名字互相ping通.例:</p>
+<p><code>docker network create -d bridge my_bridge</code></p>
+<p>注:这里的<code>-d</code>为指定网络的类型</p>
+<h2 id="数据卷"><a href="#数据卷" class="headerlink" title="数据卷"></a>数据卷</h2><p>数据卷一般用于数据持久化,下面以dockerhub官方的mysql镜像为例,</p>
+<p>查看mysql的dockerfile可以看到<code>VOLUME /var/lib/mysql</code>这一行,说明mysql将数据存储在容器中的<code>/var/lib/mysql</code>目录下,并自动挂载到一个主机的目录可以<code>inspect</code>容器或者volume(启动一个mysql容器会产生一个volume,可以用docker volume ls查看)就可以看到详细的目录.但是自动生成的volume名字十分冗长,</p>
+<p><strong>修改volume的名字</strong></p>
+<p><code>docker run --name mysql1 -d -v mysql_v_name:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=1 mysql</code></p>
+<p>上面的命令是常见的启动mysql容器的命令,其中<code>-v mysql_v_name:/var/lib/mysql</code>命令指定了本地的挂载点<code>:</code>前面就是本地的目录,后面就是容器里的目录(可以通过dockerfile查看),相当于重命名</p>
+<p>通过inspect可知道全路径为:<code>&quot;/var/lib/docker/volumes/mysql_v_name/_data&quot;</code></p>
+<p><strong>这样的优点</strong></p>
+<p>创建第二个容器</p>
+<p><code>docker run --name mysql2 -d -v mysql_v_name:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=1 mysql</code></p>
+<p>注意这里的<code>-v</code>后面指定的名字是前一个容器的挂载点,这样一来,前一个容器删除后,第二个容器可以接着使用第一个容器的数据.</p>
+<p><strong>共享主机的文件夹</strong></p>
+<p>注意一个原则,我们尽量不要在容器里面操作,应当在外面通过命令来操控容器,通常情况下,容器是不带vim或其他文本编辑工具的,所以一种有效的的办法是通过主机和容器共享一个文件夹,这样一来就可以在主机里通过vim等工具来编写代码.</p>
+<p><code>docker run --name test -d -v /home/kainhuck/Documents/PyCode:/temp/PyCode python:3.7</code></p>
+<p>这里创建一个Python3.7的容器,并将本地文件夹<code>/home/kainhuck/Documents/PyCode</code>关联到容器里的<code>/temp/PyCode</code>目录.</p>
+<p>这种方式关联的文件相当于同一个文件,操作均为同步,里面修改,外面也会修改.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">Docker 总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AF%B4%E5%9C%A8%E5%89%8D%E5%A4%B4-Docker%E5%91%BD%E4%BB%A4%E7%9A%84%E6%A0%BC%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">1. 说在前头(Docker命令的格式)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%B9%E5%99%A8"><span class="toc-number">3.</span> <span class="toc-text">2.容器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8"><span class="toc-number">3.1.</span> <span class="toc-text">创建容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E5%85%A5%E5%AE%B9%E5%99%A8"><span class="toc-number">3.2.</span> <span class="toc-text">进入容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF"><span class="toc-number">3.3.</span> <span class="toc-text">查看容器详细信息</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C"><span class="toc-number">4.</span> <span class="toc-text">网络</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="toc-number">5.</span> <span class="toc-text">数据卷</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&text=docker操作总结"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&is_video=false&description=docker操作总结"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=docker操作总结&body=Check out this article: https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&title=docker操作总结"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&name=docker操作总结&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2019/08/30/docker%E6%93%8D%E4%BD%9C%E6%80%BB%E7%BB%93/&t=docker操作总结"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    KainHuck
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

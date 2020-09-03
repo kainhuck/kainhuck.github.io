@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="1.说在前头“抽象基类”这个词可能听着比较”深奥”,其实”基类”就是”父类”,”抽象”就是”假”的意思, “抽象基类”就是”假父类.” 2.对之前元类的一点补充之前说过通过元类实例化类的语法是 1变量名 &#x3D; type(&quot;类名&quot;, (&quot;继承的类&quot;,), &amp;#123;&quot;属性名&quot;:&quot;属性值&quot;&amp;#125;)  现在介绍另一种方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-抽象基类">
+<meta property="og:url" content="https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/index.html">
+<meta property="og:site_name" content="Kainhuck&#39;s blog">
+<meta property="og:description" content="1.说在前头“抽象基类”这个词可能听着比较”深奥”,其实”基类”就是”父类”,”抽象”就是”假”的意思, “抽象基类”就是”假父类.” 2.对之前元类的一点补充之前说过通过元类实例化类的语法是 1变量名 &#x3D; type(&quot;类名&quot;, (&quot;继承的类&quot;,), &amp;#123;&quot;属性名&quot;:&quot;属性值&quot;&amp;#125;)  现在介绍另一种方">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-07-21T03:12:22.000Z">
+<meta property="article:modified_time" content="2020-09-03T06:40:00.490Z">
+<meta property="article:author" content="KainHuck">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>python-抽象基类</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2019/07/27/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB%E4%B9%8B%E5%A3%B0%E6%98%8E%E5%8D%8F%E8%AE%AE/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&text=python-抽象基类"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&is_video=false&description=python-抽象基类"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-抽象基类&body=Check out this article: https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&name=python-抽象基类&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&t=python-抽象基类"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AF%B4%E5%9C%A8%E5%89%8D%E5%A4%B4"><span class="toc-number">1.</span> <span class="toc-text">1.说在前头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%B9%E4%B9%8B%E5%89%8D%E5%85%83%E7%B1%BB%E7%9A%84%E4%B8%80%E7%82%B9%E8%A1%A5%E5%85%85"><span class="toc-number">2.</span> <span class="toc-text">2.对之前元类的一点补充</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%B8%AD%E5%AD%90%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">3.鸭子类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB"><span class="toc-number">4.</span> <span class="toc-text">4.抽象基类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">4.1.</span> <span class="toc-text">1. 抽象基类的定义:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-register%E6%96%B9%E6%B3%95"><span class="toc-number">4.2.</span> <span class="toc-text">2. register方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AF%B9%E5%89%8D%E9%9D%A2%E4%BE%8B%E5%AD%90%E7%9A%84%E6%96%B9%E6%A1%88%E4%B8%89%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.3.</span> <span class="toc-text">3. 对前面例子的方案三实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-subclasshook-%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95"><span class="toc-number">4.4.</span> <span class="toc-text">4.__subclasshook__魔法方法</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        python-抽象基类
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kainhuck's blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-07-21T03:12:22.000Z" itemprop="datePublished">2019-07-21</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">编程语言</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-说在前头"><a href="#1-说在前头" class="headerlink" title="1.说在前头"></a>1.说在前头</h2><p>“抽象基类”这个词可能听着比较”深奥”,其实”基类”就是”父类”,”抽象”就是”假”的意思,</p>
+<p>“抽象基类”就是”假父类.”</p>
+<h2 id="2-对之前元类的一点补充"><a href="#2-对之前元类的一点补充" class="headerlink" title="2.对之前元类的一点补充"></a>2.对之前元类的一点补充</h2><p>之前说过通过元类实例化类的语法是</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">变量名 = type(<span class="string">&quot;类名&quot;</span>, (<span class="string">&quot;继承的类&quot;</span>,), &#123;<span class="string">&quot;属性名&quot;</span>:<span class="string">&quot;属性值&quot;</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>现在介绍另一种方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> 类名(<span class="params">metaclass=元类名</span>):</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>举个例子:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="comment"># __author__: kainhuck</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个元类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyMetaClass</span>(<span class="params">type</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span>(<span class="params">cls, name, bases, attrs</span>):</span></span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        :param name: 类名</span></span><br><span class="line"><span class="string">        :param bases: 继承的基类</span></span><br><span class="line"><span class="string">        :param attrs: 拥有的属性</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        要求必须含有name属性</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span></span><br><span class="line">        name = attrs.get(<span class="string">&quot;name&quot;</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="keyword">if</span> name <span class="keyword">and</span> <span class="keyword">not</span> callable(name):</span><br><span class="line">            <span class="keyword">return</span> type.__new__(cls, name, bases, attrs)</span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError(<span class="string">&quot;必须含有name属性&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义普通类</span></span><br><span class="line"><span class="comment"># class MyClassA(metaclass=MyMetaClass):     # 报错,没有定义name属性</span></span><br><span class="line"><span class="comment">#     pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义普通类</span></span><br><span class="line"><span class="comment"># class MyClassB(metaclass=MyMetaClass):  # 报错,没有定义name属性</span></span><br><span class="line"><span class="comment">#     def name(self):</span></span><br><span class="line"><span class="comment">#         pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># class MyClassC(metaclass=MyMetaClass):  # 报错,没有定义name属性</span></span><br><span class="line"><span class="comment">#     def __init__(self):</span></span><br><span class="line"><span class="comment">#         self.name = &quot;kainhuck&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClassD</span>(<span class="params">metaclass=MyMetaClass</span>):</span>  <span class="comment"># 没有报错</span></span><br><span class="line">    name = <span class="string">&quot;kainhuck&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-鸭子类型"><a href="#3-鸭子类型" class="headerlink" title="3.鸭子类型"></a>3.鸭子类型</h2><p>鸭子类型:如果一个东西看起来想一个鸭子,叫起来像一个鸭子,那么它大概就是一只鸭子.</p>
+<p>在Python中有些时候我们需要一个有某个功能(比如说:鸭子叫)的对象,那我们可以通过判断这个对象是不是一只鸭子来检测是否满足我们的需求;但仔细想想这有些缺陷,因为我们真正需要的是<code>鸭子叫</code>这个方法,一个对象无论是不是鸭子只要他会像鸭子一样叫就可以啦.</p>
+<p>这话可能有些绕,让我来举一个例子</p>
+<p>有这么一个函数:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">something</span>):</span></span><br><span class="line">    print(something[<span class="number">0</span>])</span><br></pre></td></tr></table></figure>
+
+<p>这个函数会打印出参数的第一个元素,其实这里隐含着一个条件–参数支持下标索引.为了使代码完善我们应该对该函数做点修改.</p>
+<p>方案一.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">something</span>):</span></span><br><span class="line">    <span class="keyword">if</span> isinstance(something, (list, tuple, set)):	<span class="comment"># 这些方法支持下标索引</span></span><br><span class="line">        print(something[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&quot;Error&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>方案一的缺点:</p>
+<blockquote>
+<p>这样写就默认把something的类型限定了,拓展性很差</p>
+<p>我们知道只要自定义的类实现了<code>__getitem__</code>方法就可以使其支持下标索引.</p>
+</blockquote>
+<p>方案二.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">something</span>):</span></span><br><span class="line">    <span class="keyword">if</span> hasattr(something, <span class="string">&#x27;__getitem__&#x27;</span>):	</span><br><span class="line">        print(something[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&quot;Error&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>方案二的缺点:</p>
+<blockquote>
+<p>并不是所有实现<code>__getitem__</code>的方法都可以支持下标索引,比如<code>字典</code>类型</p>
+</blockquote>
+<p>这样似乎没有解决方案了..其实抽象基类就完美的解决了这问题</p>
+<h2 id="4-抽象基类"><a href="#4-抽象基类" class="headerlink" title="4.抽象基类"></a>4.抽象基类</h2><h3 id="1-抽象基类的定义"><a href="#1-抽象基类的定义" class="headerlink" title="1. 抽象基类的定义:"></a>1. 抽象基类的定义:</h3><p>由abc.ABCMeta这个元类实现的类就是抽象基类,如</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractClass</span>(<span class="params">metaclass=abc.ABCMeta</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-register方法"><a href="#2-register方法" class="headerlink" title="2. register方法"></a>2. register方法</h3><p>定义好的抽象基类通过<code>register</code>方法可以成为别的类的父类</p>
+<p>举个例子:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> abc</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个抽象基类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractClass</span>(<span class="params">metaclass=abc.ABCMeta</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个普通类继承自object</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把我们定义的抽象基类注册为MyClass的父类</span></span><br><span class="line">AbstractClass.register(MyClass)</span><br><span class="line">mc = MyClass()</span><br><span class="line">print(issubclass(MyClass, AbstractClass))  <span class="comment"># 输出True</span></span><br><span class="line">print(isinstance(mc, AbstractClass))  <span class="comment"># 输出True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将我们定义的抽象基类注册到系统定义的类</span></span><br><span class="line">AbstractClass.register(list)</span><br><span class="line"></span><br><span class="line">print(isinstance([], AbstractClass))    <span class="comment"># 输出True</span></span><br></pre></td></tr></table></figure>
+
+<p><em>说明一点:抽象基类虽然可以成为别的类的父类,但是别的类并不会继承抽象基类的方法和属性</em></p>
+<h3 id="3-对前面例子的方案三实现"><a href="#3-对前面例子的方案三实现" class="headerlink" title="3. 对前面例子的方案三实现"></a>3. 对前面例子的方案三实现</h3><p>方案三.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MySequence</span>(<span class="params">metaclass=ABCMeta</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">MySequence.register(list)	<span class="comment"># 注册为列表的父类</span></span><br><span class="line">MySequence.register(tuple)	<span class="comment"># 注册为元组的父类</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">也可以自定义一个类,将MySequence注册为其父类</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">something</span>):</span></span><br><span class="line">    <span class="keyword">if</span> isinstance(something, AbstractClass):	<span class="comment"># AbstractClass的子类</span></span><br><span class="line">        print(something[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&quot;Error&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-subclasshook-魔法方法"><a href="#4-subclasshook-魔法方法" class="headerlink" title="4.__subclasshook__魔法方法"></a>4.<code>__subclasshook__</code>魔法方法</h3><p>看过上面的例子你们肯定会觉得,给每个类都注册一遍抽象基类太麻烦了,没错Python的开发者也这么觉得,于是<code>__subclasshook__</code>这个方法出现了</p>
+<p>几点说明:</p>
+<ol>
+<li>该方法定义在抽象基类中</li>
+<li>该方法必须定义为类方法</li>
+<li>该方法有三个返回值<ol>
+<li>True: 如果测试类被认为是子类</li>
+<li>False: 如果测试类不被认为是子类</li>
+<li>NotImplemented: 这个后面讲</li>
+</ol>
+</li>
+</ol>
+<p>定义一个抽象基类:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> abc</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractDuck</span>(<span class="params">metaclass=abc.ABCMeta</span>):</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__subclasshook__</span>(<span class="params">cls, subclass</span>):</span></span><br><span class="line">        quack = getattr(subclass, <span class="string">&#x27;quack&#x27;</span>, <span class="literal">None</span>)  <span class="comment"># 取出subclass的 quack 属性,如果不存在则返回 None</span></span><br><span class="line">        <span class="keyword">return</span> callable(quack)  <span class="comment"># 返回quack是否可以调用(是否是个方法)</span></span><br></pre></td></tr></table></figure>
+
+<p>定义两个测试类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Duck</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">quack</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NotDuck</span>(<span class="params">object</span>):</span></span><br><span class="line">    quack = <span class="string">&quot;foo&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>判断是否是AbstractDuck的子类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(issubclass(Duck, AbstractDuck))  <span class="comment"># 输出 True</span></span><br><span class="line">print(issubclass(NotDuck, AbstractDuck))  <span class="comment"># 输出 False</span></span><br></pre></td></tr></table></figure>
+
+<p>注意:<code>__subclasshook__</code>方法的优先级大于<code>register</code></p>
+<p>举个例子解释<code>NotImplemented</code>返回值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">6</span>]: <span class="keyword">import</span> abc                                                                                                                                   </span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: <span class="class"><span class="keyword">class</span> <span class="title">AbstractDuck</span>(<span class="params">metaclass=abc.ABCMeta</span>):</span> </span><br><span class="line">   ...:     @classmethod </span><br><span class="line">   ...:     <span class="function"><span class="keyword">def</span> <span class="title">__subclasshook__</span>(<span class="params">cls, subclass</span>):</span> </span><br><span class="line">   ...:         quack = getattr(subclass, <span class="string">&#x27;quack&#x27;</span>, <span class="literal">None</span>)  <span class="comment"># 取出subclass的 quack 属性,如果不存在则返回 None </span></span><br><span class="line">   ...:         <span class="keyword">if</span> callable(quack): </span><br><span class="line">   ...:             <span class="keyword">return</span> <span class="literal">True</span> </span><br><span class="line">   ...:         <span class="keyword">return</span> <span class="built_in">NotImplemented</span> </span><br><span class="line">   ...:                                                                                                                                                                                                                                                                                   </span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: <span class="class"><span class="keyword">class</span> <span class="title">Duck</span>(<span class="params">object</span>):</span> </span><br><span class="line">   ...:     <span class="function"><span class="keyword">def</span> <span class="title">quack</span>(<span class="params">self</span>):</span> </span><br><span class="line">   ...:         <span class="keyword">pass</span> </span><br><span class="line">   ...:                                                                                                                                              </span><br><span class="line"></span><br><span class="line">In [<span class="number">9</span>]: <span class="class"><span class="keyword">class</span> <span class="title">NotDuck</span>(<span class="params">object</span>):</span> </span><br><span class="line">   ...:     quack = <span class="string">&quot;foo&quot;</span> </span><br><span class="line">   ...:                                                                                                                                                                                                                                                           </span><br><span class="line"></span><br><span class="line">In [<span class="number">10</span>]: issubclass(NotDuck, AbstractDuck)                                                                                                           </span><br><span class="line">Out[<span class="number">10</span>]: <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">11</span>]: AbstractDuck.register(NotDuck)                                                                                                              </span><br><span class="line">Out[<span class="number">11</span>]: __main__.NotDuck</span><br><span class="line"></span><br><span class="line">In [<span class="number">12</span>]: issubclass(NotDuck, AbstractDuck)                                                                                                           </span><br><span class="line">Out[<span class="number">12</span>]: <span class="literal">True</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AF%B4%E5%9C%A8%E5%89%8D%E5%A4%B4"><span class="toc-number">1.</span> <span class="toc-text">1.说在前头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%B9%E4%B9%8B%E5%89%8D%E5%85%83%E7%B1%BB%E7%9A%84%E4%B8%80%E7%82%B9%E8%A1%A5%E5%85%85"><span class="toc-number">2.</span> <span class="toc-text">2.对之前元类的一点补充</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%B8%AD%E5%AD%90%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">3.鸭子类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB"><span class="toc-number">4.</span> <span class="toc-text">4.抽象基类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">4.1.</span> <span class="toc-text">1. 抽象基类的定义:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-register%E6%96%B9%E6%B3%95"><span class="toc-number">4.2.</span> <span class="toc-text">2. register方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AF%B9%E5%89%8D%E9%9D%A2%E4%BE%8B%E5%AD%90%E7%9A%84%E6%96%B9%E6%A1%88%E4%B8%89%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.3.</span> <span class="toc-text">3. 对前面例子的方案三实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-subclasshook-%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95"><span class="toc-number">4.4.</span> <span class="toc-text">4.__subclasshook__魔法方法</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&text=python-抽象基类"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&is_video=false&description=python-抽象基类"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-抽象基类&body=Check out this article: https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&title=python-抽象基类"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&name=python-抽象基类&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://kainhuck.github.io/2019/07/21/python-%E6%8A%BD%E8%B1%A1%E5%9F%BA%E7%B1%BB/&t=python-抽象基类"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    KainHuck
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/tags/">标签</a></li>
+         
+          <li><a href="/categories/">分类</a></li>
+         
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
